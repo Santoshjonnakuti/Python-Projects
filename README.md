@@ -4,7 +4,7 @@ Simple python projects for beginners..\
 Modules Used:
 1. random
 2. tkinter
-\
+
 
 [2. Hangman](Hangman)\
 Modules Used:
