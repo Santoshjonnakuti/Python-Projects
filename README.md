@@ -22,3 +22,7 @@ Modules Used:
 Modules Used:
 1. tkinter
 
+
+[5. Random Number Generator](Random_Number_Generator)\
+Modules Used:
+1. random
