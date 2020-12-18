@@ -16,3 +16,9 @@ Modules Used:
 [3. Password Generator](Password_Generator)\
 Modules Used:\
 1.random
+
+
+[3. Calculator](Calculator)\
+Modules Used:
+1. tkinter
+
