@@ -14,8 +14,8 @@ Modules Used:
 
 
 [3. Password Generator](Password_Generator)\
-Modules Used:\
-1.random
+Modules Used:
+1. random
 
 
 [3. Calculator](Calculator)\
