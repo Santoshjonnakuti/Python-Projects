@@ -26,3 +26,9 @@ Modules Used:
 [5. Random Number Generator](Random_Number_Generator)\
 Modules Used:
 1. random
+
+
+[6. Currency Converter](Currency-Converter)\
+Modules Used:
+1. tkinter
+2. PIL
