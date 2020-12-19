@@ -34,3 +34,11 @@ Modules Used:
 2. PIL
 3. requests
 4. Beautiful Soup &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; #pip install BeautifulSoup
+
+
+[7. Multilingual Translator](Multilingual-Translator)\
+Modules Used:
+1. tkinter
+2. PIL
+3. requests
+4. Beautiful Soup &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; #pip install BeautifulSoup
