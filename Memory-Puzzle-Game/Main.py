@@ -44,7 +44,7 @@ def buttonFunction(button):
             break
     button.config(image=imageList[t-1])
     if len(btnLst) == 2:
-        newThread2()
+        newThread(check)
     return
 
 
@@ -71,14 +71,9 @@ def forgetFunction():
         buttonList[i].config(image='')
 
 
-def newThread1():
-    NewThread = threading.Thread(target=arrangeFunction)
+def newThread(key):
+    NewThread = threading.Thread(target=key)
     NewThread.start()
-
-
-def newThread2():
-    nThread = threading.Thread(target=check)
-    nThread.start()
 
 
 root = tk.Tk()
@@ -110,7 +105,7 @@ img16 = ImageTk.PhotoImage(Image.open("satellite.png"))
 img17 = ImageTk.PhotoImage(Image.open("telephone.jpg"))
 img18 = ImageTk.PhotoImage(Image.open("tv.png"))
 
-startButton = tk.Button(root, text="Start", padx=30, bg="white", fg="black", font=("Helvetica", 27, "bold"), command=newThread1)
+startButton = tk.Button(root, text="Start", padx=30, bg="white", fg="black", font=("Helvetica", 27, "bold"), command=lambda: newThread(arrangeFunction))
 startButton.place(x=700, y=50, anchor=tk.CENTER)
 scoreLabel.place(x=640, y=110, anchor=tk.CENTER)
 scoreValueLabel.place(x=690, y=110, anchor=tk.CENTER)
