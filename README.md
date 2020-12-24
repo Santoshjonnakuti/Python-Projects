@@ -53,7 +53,7 @@ Modules Used:
 5. time
 
 
-[8. Memory Puzzle Game](Memory-Puzzle-Game)\
+[9. Text Editor](Text-Editor)\
 Modules Used:
 1. tkinter
 2. PIL
