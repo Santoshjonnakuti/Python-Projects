@@ -35,8 +35,8 @@ def saveFunction():
         pass
     r = tk.Tk()
     r.withdraw()
-    folder_selected = filedialog.askdirectory()
-    name = os.path.join(folder_selected, name)
+    folderSelected = filedialog.askdirectory()
+    name = os.path.join(folderSelected, name)
     r.destroy()
     file = open(name, "w")
     file.write(data)
