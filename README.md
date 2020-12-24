@@ -44,11 +44,18 @@ Modules Used:
 4. Beautiful Soup &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; #pip install BeautifulSoup
 
 
-[7. Memory Puzzle Game](Memory-Puzzle-Game)\
+[8. Memory Puzzle Game](Memory-Puzzle-Game)\
 Modules Used:
 1. tkinter
 2. PIL
 3. random
 4. threading
 5. time
+
+
+[8. Memory Puzzle Game](Memory-Puzzle-Game)\
+Modules Used:
+1. tkinter
+2. PIL
+3. os
 
