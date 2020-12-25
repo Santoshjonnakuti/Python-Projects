@@ -3,7 +3,8 @@ from tkinter import filedialog
 from tkinter import messagebox
 from PIL import Image, ImageTk
 import os.path
-global path
+
+global path, size
 
 
 def darkThemeFunction():
@@ -15,6 +16,8 @@ def darkThemeFunction():
         themeButton.config(bg="gray", fg="black")
         fontSizeIncreaseButton.config(bg="gray", fg="black")
         fontSizeDecreaseButton.config(bg="gray", fg="black")
+        boldButton.config(bg="gray", fg="black")
+        italicButton.config(bg="gray", fg="black")
         widget.config(bg="black", fg="white", insertbackground="white")
     else:
         themeButton["text"] = "Dark Theme"
@@ -24,6 +27,8 @@ def darkThemeFunction():
         themeButton.config(bg="white", fg="black")
         fontSizeIncreaseButton.config(bg="white", fg="black")
         fontSizeDecreaseButton.config(bg="white", fg="black")
+        boldButton.config(bg="white", fg="black")
+        italicButton.config(bg="white", fg="black")
         widget.config(bg="white", fg="black", insertbackground="black")
     return
 
@@ -49,18 +54,19 @@ def saveAsFunction():
 
 
 def fontFunction(key):
+    global size
     if key == "Increase":
         fontSizeDecreaseButton["cursor"] = "hand2"
-        if int(widget["font"][18:]) != 20:
-            widget["font"] = ("Times New Roman", int(widget["font"][18:]) + 2)
+        if int(widget["font"][18:20]) != 20:
+            widget["font"] = ("Times New Roman", int(widget["font"][18:20]) + 2)
             return
         else:
             fontSizeIncreaseButton["cursor"] = "no"
             return
     elif key == "Decrease":
         fontSizeIncreaseButton["cursor"] = "hand2"
-        if int(widget["font"][18:]) != 10:
-            widget["font"] = ("Times New Roman", int(widget["font"][18:]) - 2)
+        if int(widget["font"][18:20]) != 10:
+            widget["font"] = ("Times New Roman", int(widget["font"][18:20]) - 2)
             return
         else:
             fontSizeDecreaseButton["cursor"] = "no"
@@ -82,9 +88,10 @@ def colorChangeFunction(button):
 def openButtonFunction():
     global path
     saveButton.config(state=tk.ACTIVE, cursor="hand2")
-    filename = filedialog.askopenfilename(initialdir="/", title="Select a File", filetypes=(("Text files", "*.txt*"),
-                                                                                            ("all files",
-                                                                                             "*.*")))
+    filename = filedialog.askopenfilename(initialdir="Desktop", title="Select a File",
+                                          filetypes=(("Text files", "*.txt*"),
+                                                     ("all files",
+                                                      "*.*")))
     if filename == '':
         return
     elif ".txt" in filename or ".py" in filename:
@@ -110,6 +117,23 @@ def saveFunction():
         file.write(data)
         file.close()
         return
+
+
+def styleFunction(key):
+    if key == "Bold":
+        if widget["font"][21:] == "bold":
+            widget.config(font=("Times New Roman", int(widget["font"][18:20])))
+            return
+        else:
+            widget.config(font=("Times New Roman", int(widget["font"][18:20]), "bold"))
+            return
+    elif key == "Italic":
+        if widget["font"][21:] == "italic":
+            widget.config(font=("Times New Roman", int(widget["font"][18:20])))
+            return
+        else:
+            widget.config(font=("Times New Roman", int(widget["font"][18:20]), "italic"))
+            return
 
 
 root = tk.Tk()
@@ -147,6 +171,10 @@ orangeButton.pack(side=tk.LEFT)
 cancelButton = tk.Button(frame, text="Cancel", image=cancelImage, command=lambda: colorChangeFunction(cancelButton),
                          cursor="hand2")
 cancelButton.pack(side=tk.LEFT)
+boldButton = tk.Button(frame, text="B", bg="white", fg="black", cursor="hand2", command=lambda: styleFunction("Bold"))
+boldButton.pack(side=tk.LEFT)
+italicButton = tk.Button(frame, text="I", bg="white", fg="black", command=lambda: styleFunction("Italic"))
+italicButton.pack(side=tk.LEFT)
 themeButton = tk.Button(frame, text="Dark Theme", bg="white", fg="black", command=darkThemeFunction, cursor="hand2")
 themeButton.pack(side=tk.LEFT)
 widget = tk.Text(cursor="xterm", font=("Times New Roman", 10))
