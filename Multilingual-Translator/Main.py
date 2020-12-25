@@ -6,7 +6,12 @@ from bs4 import BeautifulSoup
 
 
 def Function(url):
-    response = requests.get(url)
+    try:
+        response = requests.get(url)
+    except Exception:
+        errorLabel.config(text="No Internet Connection...")
+        errorLabel.place(x=300, y=300, anchor=tk.CENTER)
+        return
     soup = BeautifulSoup(response.content, "html.parser")
     tag = soup.find("div", attrs={"class": "MUxGbd u31kKd gsrt lyLwlc", "id": "lrtl-translation-text"})
     if tag is None:
