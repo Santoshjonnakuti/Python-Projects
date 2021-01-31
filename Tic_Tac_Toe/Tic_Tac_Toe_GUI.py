@@ -1,29 +1,30 @@
 import tkinter as tk
 from tkinter import messagebox
+from PIL import Image, ImageTk
 import random
 global chance
 
 
 def buttonFunction(number):
+    global chance
     button = btnLst[number - 1]
     if button["cursor"] == "no":
         return
-    global chance
     if chance == 9:
         titleLabel["text"] = "Done..."
-        button.config(cursor="no", text="X")
+        button.config(cursor="no", text="X", image=xImage)
         chance += 1
         check()
         return
     if chance % 2 != 0:
-        button.config(cursor="no", text="X")
+        button.config(cursor="no", text="X", image=xImage)
         chance += 1
         titleLabel["text"] = "O's Turn"
         check()
         return
     else:
         button = btnLst[number - 1]
-        button.config(cursor="no", text="O")
+        button.config(cursor="no", text="O", image=oImage)
         chance += 1
         titleLabel["text"] = "X's Turn"
         check()
@@ -34,15 +35,18 @@ def playFunction():
     singlePlayerButton.place(x=200, y=200, anchor=tk.CENTER)
     doublePlayerButton.place(x=200, y=230, anchor=tk.CENTER)
     backButton.place(x=200, y=300, anchor=tk.CENTER)
+    return
 
 
 def singlePlayerFunction():
+    singlePlayerButton.place_forget()
+    doublePlayerButton.place_forget()
     global chance
     chance = 1
     titleLabel["text"] = "X's Turn"
     backButton["text"] = "Back"
     for btn in btnLst:
-        btn.config(text=" ", cursor="hand2")
+        btn.config(text=" ", cursor="hand2", image="")
     button1["command"] = lambda: singlePlayer(1)
     button2["command"] = lambda: singlePlayer(2)
     button3["command"] = lambda: singlePlayer(3)
@@ -65,12 +69,14 @@ def singlePlayerFunction():
 
 
 def doublePlayerFunction():
+    singlePlayerButton.place_forget()
+    doublePlayerButton.place_forget()
     global chance
     chance = 1
     titleLabel["text"] = "X's Turn"
     backButton["text"] = "Back"
     for btn in btnLst:
-        btn.config(text=" ", cursor="hand2")
+        btn.config(text=" ", cursor="hand2", image="")
     button1["command"] = lambda: buttonFunction(1)
     button2["command"] = lambda: buttonFunction(2)
     button3["command"] = lambda: buttonFunction(3)
@@ -101,6 +107,7 @@ def backButtonFunction(button):
         doublePlayerButton.place_forget()
         backButton.place_forget()
         playButton.place(x=200, y=200, anchor=tk.CENTER)
+        return
     else:
         chance = 1
         for btn in btnLst:
@@ -207,7 +214,7 @@ def check():
         if chance == 10:
             messagebox.showinfo("Winner", "No result.\nGreat! You both done well..\nPlease restart the game.")
             rePlayButton.place(x=200, y=300, anchor=tk.CENTER)
-            return
+    return
 
 
 def singlePlayer(number):
@@ -216,10 +223,11 @@ def singlePlayer(number):
         return
     global chance
     if chance % 2 != 0:
-        button.config(text="X", cursor="no")
+        button.config(text="X", cursor="no", image=xImage)
         chance += 1
         computerPlayer()
         check()
+        return
 
 
 def computerPlayer():
@@ -228,7 +236,55 @@ def computerPlayer():
     lst = [btn for btn in btnLst if btn["text"] != 'X' and btn["text"] == " "]
     if len(lst) == 0:
         return
-    if btnLst[0]["text"] == "X" and btnLst[1]["text"] == "X" and btnLst[2]["text"] == " ":
+    if btnLst[0]["text"] == "O" and btnLst[1]["text"] == "O" and btnLst[2]["text"] == " ":
+        button = btnLst[2]
+    elif btnLst[0]["text"] == "O" and btnLst[2]["text"] == "O" and btnLst[1]["text"] == " ":
+        button = btnLst[1]
+    elif btnLst[1]["text"] == "O" and btnLst[2]["text"] == "O" and btnLst[0]["text"] == " ":
+        button = btnLst[0]
+    elif btnLst[3]["text"] == "O" and btnLst[4]["text"] == "O" and btnLst[5]["text"] == " ":
+        button = btnLst[5]
+    elif btnLst[3]["text"] == "O" and btnLst[5]["text"] == "O" and btnLst[4]["text"] == " ":
+        button = btnLst[4]
+    elif btnLst[4]["text"] == "O" and btnLst[5]["text"] == "O" and btnLst[3]["text"] == " ":
+        button = btnLst[3]
+    elif btnLst[6]["text"] == "O" and btnLst[7]["text"] == "O" and btnLst[8]["text"] == " ":
+        button = btnLst[8]
+    elif btnLst[6]["text"] == "O" and btnLst[8]["text"] == "O" and btnLst[7]["text"] == " ":
+        button = btnLst[7]
+    elif btnLst[7]["text"] == "O" and btnLst[8]["text"] == "O" and btnLst[6]["text"] == " ":
+        button = btnLst[6]
+    elif btnLst[0]["text"] == "O" and btnLst[3]["text"] == "O" and btnLst[6]["text"] == " ":
+        button = btnLst[6]
+    elif btnLst[0]["text"] == "O" and btnLst[6]["text"] == "O" and btnLst[3]["text"] == " ":
+        button = btnLst[3]
+    elif btnLst[3]["text"] == "O" and btnLst[6]["text"] == "O" and btnLst[0]["text"] == " ":
+        button = btnLst[0]
+    elif btnLst[1]["text"] == "O" and btnLst[4]["text"] == "O" and btnLst[7]["text"] == " ":
+        button = btnLst[7]
+    elif btnLst[1]["text"] == "O" and btnLst[7]["text"] == "O" and btnLst[4]["text"] == " ":
+        button = btnLst[4]
+    elif btnLst[4]["text"] == "O" and btnLst[7]["text"] == "O" and btnLst[1]["text"] == " ":
+        button = btnLst[1]
+    elif btnLst[2]["text"] == "O" and btnLst[5]["text"] == "O" and btnLst[8]["text"] == " ":
+        button = btnLst[8]
+    elif btnLst[2]["text"] == "O" and btnLst[8]["text"] == "O" and btnLst[5]["text"] == " ":
+        button = btnLst[5]
+    elif btnLst[5]["text"] == "O" and btnLst[8]["text"] == "O" and btnLst[2]["text"] == " ":
+        button = btnLst[2]
+    elif btnLst[0]["text"] == "O" and btnLst[4]["text"] == "O" and btnLst[8]["text"] == " ":
+        button = btnLst[8]
+    elif btnLst[0]["text"] == "O" and btnLst[8]["text"] == "O" and btnLst[4]["text"] == " ":
+        button = btnLst[4]
+    elif btnLst[4]["text"] == "O" and btnLst[8]["text"] == "O" and btnLst[0]["text"] == " ":
+        button = btnLst[0]
+    elif btnLst[2]["text"] == "O" and btnLst[4]["text"] == "O" and btnLst[6]["text"] == " ":
+        button = btnLst[6]
+    elif btnLst[2]["text"] == "O" and btnLst[6]["text"] == "O" and btnLst[4]["text"] == " ":
+        button = btnLst[4]
+    elif btnLst[4]["text"] == "O" and btnLst[6]["text"] == "O" and btnLst[2]["text"] == " ":
+        button = btnLst[2]
+    elif btnLst[0]["text"] == "X" and btnLst[1]["text"] == "X" and btnLst[2]["text"] == " ":
         button = btnLst[2]
     elif btnLst[0]["text"] == "X" and btnLst[2]["text"] == "X" and btnLst[1]["text"] == " ":
         button = btnLst[1]
@@ -278,7 +334,7 @@ def computerPlayer():
         button = btnLst[2]
     else:
         button = random.choice(lst)
-    button.config(text="O", cursor="no")
+    button.config(text="O", cursor="no", image=oImage)
     chance += 1
     return
 
@@ -301,6 +357,8 @@ root.title("Tic Tac Toe")
 root.geometry("400x400")
 root.maxsize(400, 400)
 root.minsize(400, 400)
+xImage = ImageTk.PhotoImage(Image.open("X.jpg"))
+oImage = ImageTk.PhotoImage(Image.open("O.jpg"))
 titleLabel = tk.Label(root, text="Tic Tac Toe", font=("Helvetica", 25, "bold"), fg="black", bg="white")
 titleLabel.place(x=208, y=40, anchor=tk.CENTER)
 playButton = tk.Button(root, text="Play", fg="green", bg="white", font=("Times new roman", 10, "bold"), cursor="hand2", command=playFunction)
