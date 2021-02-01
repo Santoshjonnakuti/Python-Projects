@@ -59,3 +59,11 @@ Modules Used:
 2. PIL
 3. os
 
+
+[10. Alarm Clock](AlarmClock)\
+Modules Used:
+1. tkinter
+2. threading
+3. winsound
+4. time
+
