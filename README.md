@@ -67,3 +67,10 @@ Modules Used:
 3. winsound
 4. time
 
+
+[11. Timer](Timer)\
+Modules Used:
+1. tkinter
+2. threading
+3. winsound
+4. time
