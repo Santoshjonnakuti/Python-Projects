@@ -21,4 +21,43 @@ def getStudent(userName):
         val = None
     else:
         val = rows[0][0]
+    conn.commit()
+    conn.close()
     return val
+
+
+def getSecurityAnswer(userName):
+    conn = sqlite3.connect("Students.sqlite")
+    cur = conn.cursor()
+    cur.execute('''SELECT SQAnswer FROM Students_DataBase WHERE Username=?''', (userName,))
+    rows = cur.fetchall()
+    if not rows:
+        val = None
+    else:
+        val = rows[0][0]
+    conn.commit()
+    conn.close()
+    return val
+
+
+def getSecurityQuestion(userName):
+    conn = sqlite3.connect("Students.sqlite")
+    cur = conn.cursor()
+    cur.execute('''SELECT SecurityQuestion FROM Students_DataBase WHERE Username=?''', (userName,))
+    rows = cur.fetchall()
+    if not rows:
+        val = None
+    else:
+        val = rows[0][0]
+    conn.commit()
+    conn.close()
+    return val
+
+
+def setPassword(userName, password):
+    conn = sqlite3.connect("Students.sqlite")
+    cur = conn.cursor()
+    cur.execute('''UPDATE Students_DataBase SET Password=? WHERE Username=?''', (password, userName))
+    conn.commit()
+    conn.close()
+    return
