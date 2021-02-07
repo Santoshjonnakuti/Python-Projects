@@ -5,6 +5,7 @@ from tkinter import messagebox
 from tkcalendar import DateEntry
 import StudentDataBase
 import StaffDataBase
+global name, staffName
 
 
 def studentShowPasswordFunction():
@@ -117,6 +118,100 @@ def studentSignUpBackFunction():
     studentSignUpFrame.place_forget()
     studentLoginFrame.place(x=400, y=400, anchor=tk.CENTER)
     staffLoginFrame.place(x=1100, y=400, anchor=tk.CENTER)
+    return
+
+
+def studentForgotPasswordFunction():
+    global name
+    uName = studentUsernameEntry.get()
+    if uName == "":
+        messagebox.showinfo("Info", "Enter Your Username...")
+        return
+    else:
+        name = uName
+        ques = StudentDataBase.getSecurityQuestion(uName)
+        if ques is None:
+            messagebox.showerror("Error", "User not Found...")
+        else:
+            studentLoginFrame.place_forget()
+            staffLoginFrame.place_forget()
+            sFPSQuesLabel["text"] = ques
+            studentForgotPasswordFrame.place(x=700, y=400, anchor=tk.CENTER)
+    return
+
+
+def studentForgotPasswordBackFunction():
+    studentForgotPasswordFrame.place_forget()
+    studentLoginFrame.place(x=400, y=400, anchor=tk.CENTER)
+    staffLoginFrame.place(x=1100, y=400, anchor=tk.CENTER)
+    return
+
+
+def studentForgotPasswordSubmitFunction():
+    ans = sFPSAnsEntry.get()
+    if ans == "":
+        messagebox.showerror("Error", "Please Input the Answer...")
+        return
+    sAns = StudentDataBase.getSecurityAnswer(name)
+    if ans == sAns:
+        studentForgotPasswordFrame.place_forget()
+        studentPasswordResetFrame.place(x=700, y=400, anchor=tk.CENTER)
+    else:
+        messagebox.showerror("Error", "Wrong Answer...")
+    return
+
+
+def studentResetPasswordBackFunction():
+    studentPasswordResetFrame.place_forget()
+    studentForgotPasswordFrame.place(x=700, y=400, anchor=tk.CENTER)
+    return
+
+
+def studentResetPasswordConfirmFunction():
+    pwd1 = sPRPasswordEntry1.get()
+    pwd2 = sPRPasswordEntry2.get()
+    if pwd1 == "" or pwd2 == "":
+        messagebox.showerror("Error", "All Fields are Compulsory...")
+        return
+    if pwd1 != pwd2:
+        messagebox.showerror("Error", "Password Mismatched...")
+        return
+    if pwd1 == pwd2:
+        if len(pwd1) < 8:
+            messagebox.showerror("Error", "Password should have atleast 8 Characters")
+            return
+        else:
+            count = 0
+            for c in range(32, 65):
+                if chr(c) in pwd1:
+                    count += 1
+                    break
+            if count == 0:
+                for c in range(91, 97):
+                    if chr(c) in pwd1:
+                        count += 1
+                        break
+            if count == 0:
+                messagebox.showerror("Error", "Password should have atleast 1 Special Character...")
+                return
+            count = 0
+            for c in range(65, 91):
+                if chr(c) in pwd1:
+                    count += 1
+                    break
+            if count == 0:
+                messagebox.showerror("Error", "Password should have atleast 1 Uppercase Character...")
+                return
+            count = 0
+            for c in range(97, 123):
+                if chr(c) in pwd1:
+                    count += 1
+                    break
+            if count == 0:
+                messagebox.showerror("Error", "Password should have atleast 1 Lowercase Character...")
+                return
+    StudentDataBase.setPassword(name, pwd1)
+    messagebox.showinfo("Success!", "Successfully Updated Password...\nGo Back and Login...")
     return
 
 
@@ -233,6 +328,100 @@ def staffSignUpBackFunction():
     return
 
 
+def staffForgotPasswordFunction():
+    global staffName
+    uName = staffUsernameEntry.get()
+    if uName == "":
+        messagebox.showinfo("Info", "Enter Your Username...")
+        return
+    else:
+        staffName = uName
+        ques = StaffDataBase.getSecurityQuestion(uName)
+        if ques is None:
+            messagebox.showerror("Error", "User not Found...")
+        else:
+            studentLoginFrame.place_forget()
+            staffLoginFrame.place_forget()
+            SFPSQuesLabel["text"] = ques
+            staffForgotPasswordFrame.place(x=700, y=400, anchor=tk.CENTER)
+    return
+
+
+def staffForgotPasswordBackFunction():
+    staffForgotPasswordFrame.place_forget()
+    studentLoginFrame.place(x=400, y=400, anchor=tk.CENTER)
+    staffLoginFrame.place(x=1100, y=400, anchor=tk.CENTER)
+    return
+
+
+def staffForgotPasswordSubmitFunction():
+    ans = SFPSAnsEntry.get()
+    if ans == "":
+        messagebox.showerror("Error", "Please Input the Answer...")
+        return
+    sAns = StaffDataBase.getSecurityAnswer(staffName)
+    if ans == sAns:
+        staffForgotPasswordFrame.place_forget()
+        staffPasswordResetFrame.place(x=700, y=400, anchor=tk.CENTER)
+    else:
+        messagebox.showerror("Error", "Wrong Answer...")
+    return
+
+
+def staffResetPasswordBackFunction():
+    staffPasswordResetFrame.place_forget()
+    staffForgotPasswordFrame.place(x=700, y=400, anchor=tk.CENTER)
+    return
+
+
+def staffResetPasswordConfirmFunction():
+    pwd1 = SPRPasswordEntry1.get()
+    pwd2 = SPRPasswordEntry2.get()
+    if pwd1 == "" or pwd2 == "":
+        messagebox.showerror("Error", "All Fields are Compulsory...")
+        return
+    if pwd1 != pwd2:
+        messagebox.showerror("Error", "Password Mismatched...")
+        return
+    if pwd1 == pwd2:
+        if len(pwd1) < 8:
+            messagebox.showerror("Error", "Password should have atleast 8 Characters")
+            return
+        else:
+            count = 0
+            for c in range(32, 65):
+                if chr(c) in pwd1:
+                    count += 1
+                    break
+            if count == 0:
+                for c in range(91, 97):
+                    if chr(c) in pwd1:
+                        count += 1
+                        break
+            if count == 0:
+                messagebox.showerror("Error", "Password should have atleast 1 Special Character...")
+                return
+            count = 0
+            for c in range(65, 91):
+                if chr(c) in pwd1:
+                    count += 1
+                    break
+            if count == 0:
+                messagebox.showerror("Error", "Password should have atleast 1 Uppercase Character...")
+                return
+            count = 0
+            for c in range(97, 123):
+                if chr(c) in pwd1:
+                    count += 1
+                    break
+            if count == 0:
+                messagebox.showerror("Error", "Password should have atleast 1 Lowercase Character...")
+                return
+    StaffDataBase.setPassword(staffName, pwd1)
+    messagebox.showinfo("Success!", "Successfully Updated Password...\nGo Back and Login...")
+    return
+
+
 root = tk.Tk()
 root.geometry("1500x800")
 root.title("Quiz")
@@ -254,7 +443,7 @@ studentPasswordEntry = tk.Entry(studentLoginFrame, width=40, font=("Times New Ro
 studentPasswordEntry.place(x=170, y=160, anchor=tk.CENTER)
 studentShowPasswordButton = tk.Button(studentLoginFrame, text="Show Password", bg="white", fg="black", bd=0, font=("Times New Roman", 10), cursor="hand2", command=studentShowPasswordFunction)
 studentShowPasswordButton.place(x=400, y=160, anchor=tk.CENTER)
-studentForgotPasswordButton = tk.Button(studentLoginFrame, text="Forgot Password?", bg="white", fg="#453c85", bd=0, font=("Times New Roman", 10), cursor="hand2")
+studentForgotPasswordButton = tk.Button(studentLoginFrame, text="Forgot Password?", bg="white", fg="#453c85", bd=0, font=("Times New Roman", 10), cursor="hand2", command=studentForgotPasswordFunction)
 studentForgotPasswordButton.place(x=285, y=190, anchor=tk.CENTER)
 studentLoginButton = tk.Button(studentLoginFrame, text="Log In", bg="white", fg="#4b396e", font=("Times New Roman", 12), cursor="hand2", bd=0, command=studentLoginFunction)
 studentLoginButton.place(x=30, y=220, anchor=tk.CENTER)
@@ -276,7 +465,7 @@ staffPasswordEntry = tk.Entry(staffLoginFrame, width=40, font=("Times New Roman"
 staffPasswordEntry.place(x=170, y=160, anchor=tk.CENTER)
 staffShowPasswordButton = tk.Button(staffLoginFrame, text="Show Password", bg="white", fg="black", bd=0, font=("Times New Roman", 10), cursor="hand2", command=staffShowPasswordFunction)
 staffShowPasswordButton.place(x=400, y=160, anchor=tk.CENTER)
-staffForgotPasswordButton = tk.Button(staffLoginFrame, text="Forgot Password?", bg="white", fg="#453c85", bd=0, font=("Times New Roman", 10), cursor="hand2")
+staffForgotPasswordButton = tk.Button(staffLoginFrame, text="Forgot Password?", bg="white", fg="#453c85", bd=0, font=("Times New Roman", 10), cursor="hand2", command=staffForgotPasswordFunction)
 staffForgotPasswordButton.place(x=285, y=190, anchor=tk.CENTER)
 staffLoginButton = tk.Button(staffLoginFrame, text="Log In", bg="white", fg="#4b396e", font=("Times New Roman", 12), cursor="hand2", bd=0, command=staffLoginFunction)
 staffLoginButton.place(x=30, y=220, anchor=tk.CENTER)
@@ -326,7 +515,7 @@ reEntryPasswordEntry.place(x=290, y=400, anchor=tk.CENTER)
 signUpButton = tk.Button(studentSignUpFrame, text="Sign up", bg="white", fg="black", font=("Times New Roman", 12), cursor="hand2", bd=0, command=StudentSignUpFunction)
 signUpButton.place(x=240, y=440, anchor=tk.CENTER)
 signUpBackButton = tk.Button(studentSignUpFrame, text="Back", fg="black", bg="white", font=("Times New Roman", 12), cursor="hand2", bd=0, command=studentSignUpBackFunction)
-signUpBackButton.place(x=240, y=550, anchor=tk.CENTER)
+signUpBackButton.place(x=240, y=480, anchor=tk.CENTER)
 
 # Staff Sign up Frame
 staffSignUpFrame = tk.LabelFrame(root, text="Sign up", bg="white", fg="#83aff7", height=600, width=500, font=("Times New Roman", 20, "bold"))
@@ -375,6 +564,53 @@ staffSubjectEntry.place(x=290, y=440, anchor=tk.CENTER)
 staffSignUpButton = tk.Button(staffSignUpFrame, text="Sign up", bg="white", fg="black", font=("Times New Roman", 12), cursor="hand2", bd=0, command=StaffSignUpFunction)
 staffSignUpButton.place(x=240, y=480, anchor=tk.CENTER)
 staffSignUpBackButton = tk.Button(staffSignUpFrame, text="Back", fg="black", bg="white", font=("Times New Roman", 12), cursor="hand2", bd=0, command=staffSignUpBackFunction)
-staffSignUpBackButton.place(x=240, y=550, anchor=tk.CENTER)
+staffSignUpBackButton.place(x=240, y=520, anchor=tk.CENTER)
 
+# Student Forgot Password Frame
+studentForgotPasswordFrame = tk.LabelFrame(root, text="Forgot Password", bg="white", fg="#83aff7", height=600, width=500, font=("Times New Roman", 20, "bold"))
+sFPSQuesLabel = tk.Label(studentForgotPasswordFrame, text="What is Your lastname?", bg="white", fg="black", font=("Times New Roman", 12))
+sFPSQuesLabel.place(x=240, y=80, anchor=tk.CENTER)
+sFPSAnsEntry = tk.Entry(studentForgotPasswordFrame, width=30, font=("Times New Roman", 12), relief=tk.RAISED, bg="white")
+sFPSAnsEntry.place(x=240, y=120, anchor=tk.CENTER)
+sFPSubmitButton = tk.Button(studentForgotPasswordFrame, text="Submit", fg="black", bg="white", bd=0, cursor="hand2", font=("Times New Roman", 12), command=studentForgotPasswordSubmitFunction)
+sFPSubmitButton.place(x=240, y=160, anchor=tk.CENTER)
+sFPBackButton = tk.Button(studentForgotPasswordFrame, text="Back", bg="white", fg="black", font=("Times New Roman", 12), bd=0, cursor="hand2", command=studentForgotPasswordBackFunction)
+sFPBackButton.place(x=240, y=200, anchor=tk.CENTER)
+
+# Student Password Reset Frame
+studentPasswordResetFrame = tk.LabelFrame(root, text="Reset Password", bg="white", fg="#83aff7", height=600, width=500, font=("Times New Roman", 20, "bold"))
+sPRPasswordLabel = tk.Label(studentPasswordResetFrame, text="Enter the password below", bg="white", fg="black", font=("Times New Roman", 12))
+sPRPasswordLabel.place(x=240, y=80, anchor=tk.CENTER)
+sPRPasswordEntry1 = tk.Entry(studentPasswordResetFrame, width=30, font=("Times New Roman", 12), relief=tk.RAISED, bg="white")
+sPRPasswordEntry1.place(x=240, y=120, anchor=tk.CENTER)
+sPRPasswordEntry2 = tk.Entry(studentPasswordResetFrame, width=30, font=("Times New Roman", 12), relief=tk.RAISED, bg="white")
+sPRPasswordEntry2.place(x=240, y=160, anchor=tk.CENTER)
+sPRConfirmButton = tk.Button(studentPasswordResetFrame, text="Confirm", bg="white", fg="black", bd=0, cursor="hand2", font=("Times New Roman", 12), command=studentResetPasswordConfirmFunction)
+sPRConfirmButton.place(x=240, y=200, anchor=tk.CENTER)
+sPRBackButton = tk.Button(studentPasswordResetFrame, text="Back", bg="white", fg="black", bd=0, cursor="hand2", font=("Times New Roman", 12), command=studentResetPasswordBackFunction)
+sPRBackButton.place(x=240, y=240, anchor=tk.CENTER)
+
+# Student Forgot Password Frame
+staffForgotPasswordFrame = tk.LabelFrame(root, text="Forgot Password", bg="white", fg="#83aff7", height=600, width=500, font=("Times New Roman", 20, "bold"))
+SFPSQuesLabel = tk.Label(staffForgotPasswordFrame, text="What is Your lastname?", bg="white", fg="black", font=("Times New Roman", 12))
+SFPSQuesLabel.place(x=240, y=80, anchor=tk.CENTER)
+SFPSAnsEntry = tk.Entry(staffForgotPasswordFrame, width=30, font=("Times New Roman", 12), relief=tk.RAISED, bg="white")
+SFPSAnsEntry.place(x=240, y=120, anchor=tk.CENTER)
+SFPSubmitButton = tk.Button(staffForgotPasswordFrame, text="Submit", fg="black", bg="white", bd=0, cursor="hand2", font=("Times New Roman", 12), command=staffForgotPasswordSubmitFunction)
+SFPSubmitButton.place(x=240, y=160, anchor=tk.CENTER)
+SFPBackButton = tk.Button(staffForgotPasswordFrame, text="Back", bg="white", fg="black", font=("Times New Roman", 12), bd=0, cursor="hand2", command=staffForgotPasswordBackFunction)
+SFPBackButton.place(x=240, y=200, anchor=tk.CENTER)
+
+# Student Password Reset Frame
+staffPasswordResetFrame = tk.LabelFrame(root, text="Reset Password", bg="white", fg="#83aff7", height=600, width=500, font=("Times New Roman", 20, "bold"))
+SPRPasswordLabel = tk.Label(staffPasswordResetFrame, text="Enter the password below", bg="white", fg="black", font=("Times New Roman", 12))
+SPRPasswordLabel.place(x=240, y=80, anchor=tk.CENTER)
+SPRPasswordEntry1 = tk.Entry(staffPasswordResetFrame, width=30, font=("Times New Roman", 12), relief=tk.RAISED, bg="white")
+SPRPasswordEntry1.place(x=240, y=120, anchor=tk.CENTER)
+SPRPasswordEntry2 = tk.Entry(staffPasswordResetFrame, width=30, font=("Times New Roman", 12), relief=tk.RAISED, bg="white")
+SPRPasswordEntry2.place(x=240, y=160, anchor=tk.CENTER)
+SPRConfirmButton = tk.Button(staffPasswordResetFrame, text="Confirm", bg="white", fg="black", bd=0, cursor="hand2", font=("Times New Roman", 12), command=staffResetPasswordConfirmFunction)
+SPRConfirmButton.place(x=240, y=200, anchor=tk.CENTER)
+SPRBackButton = tk.Button(staffPasswordResetFrame, text="Back", bg="white", fg="black", bd=0, cursor="hand2", font=("Times New Roman", 12), command=staffResetPasswordBackFunction)
+SPRBackButton.place(x=240, y=240, anchor=tk.CENTER)
 root.mainloop()
