@@ -21,6 +21,8 @@ def getStaff(userName):
         val = None
     else:
         val = rows[0][0]
+    conn.commit()
+    conn.close()
     return val
 
 
