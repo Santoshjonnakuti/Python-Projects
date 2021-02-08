@@ -61,3 +61,47 @@ def setPassword(userName, password):
     conn.commit()
     conn.close()
     return
+
+
+def createTable(subject):
+    conn = sqlite3.connect("Subjects.sqlite")
+    cur = conn.cursor()
+    cur.execute('''CREATE TABLE IF NOT EXISTS {}
+                (Question text, Option1 text, Option2 text, Option3 text, Option4 text, Answer text)'''.format(subject))
+    conn.commit()
+    conn.close()
+    return
+
+
+def getSubject(userName):
+    conn = sqlite3.connect("Staff.sqlite")
+    cur = conn.cursor()
+    cur.execute('''SELECT Subject FROM Staff_DataBase WHERE Username=?''', (userName,))
+    rows = cur.fetchall()
+    if not rows:
+        val = None
+    else:
+        val = rows[0][0]
+    conn.commit()
+    conn.close()
+    return val
+
+
+def getName(userName):
+    conn = sqlite3.connect("Staff.sqlite")
+    cur = conn.cursor()
+    cur.execute('''SELECT Firstname FROM Staff_DataBase WHERE Username=?''', (userName,))
+    rows = cur.fetchall()
+    if not rows:
+        val = None
+    else:
+        val = rows[0][0]
+    cur.execute('''SELECT Lastname FROM Staff_DataBase WHERE Username=?''', (userName,))
+    rows = cur.fetchall()
+    if not rows:
+        val = val + " " + None
+    else:
+        val = val + " " + rows[0][0]
+    conn.commit()
+    conn.close()
+    return val
