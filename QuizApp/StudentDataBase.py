@@ -12,7 +12,7 @@ def newUser(userName, fName, lName, mobile, dOB, sQues, sAns, password):
     return
 
 
-def getStudent(userName):
+def getStudentPassword(userName):
     conn = sqlite3.connect("Students.sqlite")
     cur = conn.cursor()
     cur.execute('''SELECT Password FROM Students_DataBase WHERE Username=?''', (userName,))
@@ -61,3 +61,23 @@ def setPassword(userName, password):
     conn.commit()
     conn.close()
     return
+
+
+def getName(userName):
+    conn = sqlite3.connect("Students.sqlite")
+    cur = conn.cursor()
+    cur.execute('''SELECT Firstname FROM Students_DataBase WHERE Username=?''', (userName,))
+    rows = cur.fetchall()
+    if not rows:
+        val = None
+    else:
+        val = rows[0][0]
+    cur.execute('''SELECT Lastname FROM Students_DataBase WHERE Username=?''', (userName,))
+    rows = cur.fetchall()
+    if not rows:
+        val = val + " " + None
+    else:
+        val = val + " " + rows[0][0]
+    conn.commit()
+    conn.close()
+    return val
