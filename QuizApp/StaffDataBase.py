@@ -12,7 +12,7 @@ def newStaff(userName, fName, lName, subject, mobile, dOB, sQues, sAns, password
     return
 
 
-def getStaff(userName):
+def getStaffPassword(userName):
     conn = sqlite3.connect("Staff.sqlite")
     cur = conn.cursor()
     cur.execute('''SELECT Password FROM Staff_DataBase WHERE Username=?''', (userName,))
