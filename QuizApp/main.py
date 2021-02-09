@@ -6,6 +6,7 @@ from tkcalendar import DateEntry
 import StudentDataBase
 import StaffDataBase
 import SubjectDataBase
+
 global name, staffName
 
 
@@ -27,6 +28,7 @@ def studentSignUpFunction():
 
 
 def studentLoginFunction():
+    global name
     username = studentUsernameEntry.get()
     password = studentPasswordEntry.get()
     if username == "" or username is None:
@@ -34,10 +36,15 @@ def studentLoginFunction():
     elif password == "" or password is None:
         messagebox.showwarning("Warning", "Password Cannot be empty...")
     else:
-        pwd = StudentDataBase.getStudent(username)
+        pwd = StudentDataBase.getStudentPassword(username)
         if pwd == password:
+            name = username
+            user = StudentDataBase.getName(name)
+            studentILInfoLabel["text"] = "Welcome {}".format(user)
+            studentILSubjectCombobox["values"] = SubjectDataBase.getAllSubjects()
             studentLoginFrame.place_forget()
             staffLoginFrame.place_forget()
+            studentInsideLoginFrame.place(x=750, y=400, anchor=tk.CENTER)
         elif pwd is None:
             messagebox.showerror("Error", "Student not found...")
         elif pwd != password:
@@ -216,6 +223,26 @@ def studentResetPasswordConfirmFunction():
     return
 
 
+def studentInsideLoginOkFunction():
+    studentSubject = studentILSubjectCombobox.get()
+    if studentSubject == "" or studentSubject is None:
+        messagebox.showerror("Error", "Please Select Subject...")
+        return
+    else:
+        questionsList = SubjectDataBase.getAllQuestion(studentSubject)
+        print(questionsList)
+        return
+
+
+def studentInsideLogoutFunction():
+    studentInsideLoginFrame.place_forget()
+    studentUsernameEntry.delete(0, tk.END)
+    studentPasswordEntry.delete(0, tk.END)
+    studentLoginFrame.place(x=400, y=400, anchor=tk.CENTER)
+    staffLoginFrame.place(x=1100, y=400, anchor=tk.CENTER)
+    return
+
+
 def staffShowPasswordFunction():
     if staffShowPasswordButton["text"] == "Show Password":
         staffShowPasswordButton.config(text="Hide Password")
@@ -242,12 +269,14 @@ def staffLoginFunction():
     elif password == "" or password is None:
         messagebox.showwarning("Warning", "Password Cannot be empty...")
     else:
-        pwd = StaffDataBase.getStaff(username)
+        pwd = StaffDataBase.getStaffPassword(username)
         if pwd == password:
             staffName = username
             subject = StaffDataBase.getSubject(staffName)
             user = StaffDataBase.getName(staffName)
-            sILInfoLabel["text"] = '''Welcome {},\nYou Can add delete update Questions from your corresponding subject...\nNote : Subject is {}'''.format(user, subject)
+            sILInfoLabel[
+                "text"] = '''Welcome {},\nYou Can add delete update Questions from your corresponding subject...\nNote : Subject is {}'''.format(
+                user, subject)
             studentLoginFrame.place_forget()
             staffLoginFrame.place_forget()
             staffInsideLoginFrame.place(x=750, y=400, anchor=tk.CENTER)
@@ -295,7 +324,8 @@ def StaffSignUpFunction():
                 count += 1
                 break
     if " " in subject or count != 0:
-        messagebox.showerror("Error", "Special Characters and Spaces are not allowed in Subject...\nSuggestion: User _ or - ...")
+        messagebox.showerror("Error",
+                             "Special Characters and Spaces are not allowed in Subject...\nSuggestion: User _ or - ...")
         return
     if sPwd != sRPwd:
         messagebox.showerror("Error", "Password Mismatched...")
@@ -453,7 +483,7 @@ def staffInsideLoginAddFunction():
     if ques == "" or op1 == "" or op2 == "" or op3 == "" or op4 == "" or ans == "":
         messagebox.showerror("Error", "All Fields are compulsory...")
         return
-    if ans != op1 and ans != op2 and ans != op3 and ans !=op4:
+    if ans != op1 and ans != op2 and ans != op3 and ans != op4:
         messagebox.showerror("Error", "Answer is not listed in options...")
         return
     Subject = StaffDataBase.getSubject(staffName)
@@ -544,50 +574,67 @@ bgImage = ImageTk.PhotoImage(Image.open("Background.jpg"))
 bgLabel = tk.Label(root, image=bgImage).pack()
 
 # Student Login Frame
-studentLoginFrame = tk.LabelFrame(root, text="Student Login", bg="white", fg="#83aff7", height=600, width=500, font=("Times New Roman", 20, "bold"))
+studentLoginFrame = tk.LabelFrame(root, text="Student Login", bg="white", fg="#83aff7", height=600, width=500,
+                                  font=("Times New Roman", 20, "bold"))
 studentLoginFrame.place(x=400, y=400, anchor=tk.CENTER)
 
-studentUsernameLabel = tk.Label(studentLoginFrame, text="Username", bg="white", fg="#43518c", font=("Times New Roman", 15, "bold"))
+studentUsernameLabel = tk.Label(studentLoginFrame, text="Username", bg="white", fg="#43518c",
+                                font=("Times New Roman", 15, "bold"))
 studentUsernameLabel.place(x=50, y=40, anchor=tk.CENTER)
 studentUsernameEntry = tk.Entry(studentLoginFrame, width=40, font=("Times New Roman", 12), bg="white", relief=tk.RAISED)
 studentUsernameEntry.place(x=170, y=80, anchor=tk.CENTER)
-studentPasswordLabel = tk.Label(studentLoginFrame, text="Password", bg="white", fg="#43518c", font=("Times New Roman", 15, "bold"))
+studentPasswordLabel = tk.Label(studentLoginFrame, text="Password", bg="white", fg="#43518c",
+                                font=("Times New Roman", 15, "bold"))
 studentPasswordLabel.place(x=50, y=120, anchor=tk.CENTER)
-studentPasswordEntry = tk.Entry(studentLoginFrame, width=40, font=("Times New Roman", 12), bg="white", relief=tk.RAISED, show="*")
+studentPasswordEntry = tk.Entry(studentLoginFrame, width=40, font=("Times New Roman", 12), bg="white", relief=tk.RAISED,
+                                show="*")
 studentPasswordEntry.place(x=170, y=160, anchor=tk.CENTER)
-studentShowPasswordButton = tk.Button(studentLoginFrame, text="Show Password", bg="white", fg="black", bd=0, font=("Times New Roman", 10), cursor="hand2", command=studentShowPasswordFunction)
+studentShowPasswordButton = tk.Button(studentLoginFrame, text="Show Password", bg="white", fg="black", bd=0,
+                                      font=("Times New Roman", 10), cursor="hand2", command=studentShowPasswordFunction)
 studentShowPasswordButton.place(x=400, y=160, anchor=tk.CENTER)
-studentForgotPasswordButton = tk.Button(studentLoginFrame, text="Forgot Password?", bg="white", fg="#453c85", bd=0, font=("Times New Roman", 10), cursor="hand2", command=studentForgotPasswordFunction)
+studentForgotPasswordButton = tk.Button(studentLoginFrame, text="Forgot Password?", bg="white", fg="#453c85", bd=0,
+                                        font=("Times New Roman", 10), cursor="hand2",
+                                        command=studentForgotPasswordFunction)
 studentForgotPasswordButton.place(x=285, y=190, anchor=tk.CENTER)
-studentLoginButton = tk.Button(studentLoginFrame, text="Log In", bg="white", fg="#4b396e", font=("Times New Roman", 12), cursor="hand2", bd=0, command=studentLoginFunction)
+studentLoginButton = tk.Button(studentLoginFrame, text="Log In", bg="white", fg="#4b396e", font=("Times New Roman", 12),
+                               cursor="hand2", bd=0, command=studentLoginFunction)
 studentLoginButton.place(x=30, y=220, anchor=tk.CENTER)
-studentSignUpButton = tk.Button(studentLoginFrame, text="Don't have an account? Sign up", bg="white", fg="#4b396e", bd=0, cursor="hand2", font=("Times New Roman", 10), command=studentSignUpFunction)
+studentSignUpButton = tk.Button(studentLoginFrame, text="Don't have an account? Sign up", bg="white", fg="#4b396e",
+                                bd=0, cursor="hand2", font=("Times New Roman", 10), command=studentSignUpFunction)
 studentSignUpButton.place(x=95, y=260, anchor=tk.CENTER)
 
-
 # Staff Login Frame
-staffLoginFrame = tk.LabelFrame(root, text="Staff Login", bg="white", fg="#83aff7", height=600, width=500, font=("Times New Roman", 20, "bold"))
+staffLoginFrame = tk.LabelFrame(root, text="Staff Login", bg="white", fg="#83aff7", height=600, width=500,
+                                font=("Times New Roman", 20, "bold"))
 staffLoginFrame.place(x=1100, y=400, anchor=tk.CENTER)
 
-staffUsernameLabel = tk.Label(staffLoginFrame, text="Username", bg="white", fg="#43518c", font=("Times New Roman", 15, "bold"))
+staffUsernameLabel = tk.Label(staffLoginFrame, text="Username", bg="white", fg="#43518c",
+                              font=("Times New Roman", 15, "bold"))
 staffUsernameLabel.place(x=50, y=40, anchor=tk.CENTER)
 staffUsernameEntry = tk.Entry(staffLoginFrame, width=40, font=("Times New Roman", 12), bg="white", relief=tk.RAISED)
 staffUsernameEntry.place(x=170, y=80, anchor=tk.CENTER)
-staffPasswordLabel = tk.Label(staffLoginFrame, text="Password", bg="white", fg="#43518c", font=("Times New Roman", 15, "bold"))
+staffPasswordLabel = tk.Label(staffLoginFrame, text="Password", bg="white", fg="#43518c",
+                              font=("Times New Roman", 15, "bold"))
 staffPasswordLabel.place(x=50, y=120, anchor=tk.CENTER)
-staffPasswordEntry = tk.Entry(staffLoginFrame, width=40, font=("Times New Roman", 12), bg="white", relief=tk.RAISED, show="*")
+staffPasswordEntry = tk.Entry(staffLoginFrame, width=40, font=("Times New Roman", 12), bg="white", relief=tk.RAISED,
+                              show="*")
 staffPasswordEntry.place(x=170, y=160, anchor=tk.CENTER)
-staffShowPasswordButton = tk.Button(staffLoginFrame, text="Show Password", bg="white", fg="black", bd=0, font=("Times New Roman", 10), cursor="hand2", command=staffShowPasswordFunction)
+staffShowPasswordButton = tk.Button(staffLoginFrame, text="Show Password", bg="white", fg="black", bd=0,
+                                    font=("Times New Roman", 10), cursor="hand2", command=staffShowPasswordFunction)
 staffShowPasswordButton.place(x=400, y=160, anchor=tk.CENTER)
-staffForgotPasswordButton = tk.Button(staffLoginFrame, text="Forgot Password?", bg="white", fg="#453c85", bd=0, font=("Times New Roman", 10), cursor="hand2", command=staffForgotPasswordFunction)
+staffForgotPasswordButton = tk.Button(staffLoginFrame, text="Forgot Password?", bg="white", fg="#453c85", bd=0,
+                                      font=("Times New Roman", 10), cursor="hand2", command=staffForgotPasswordFunction)
 staffForgotPasswordButton.place(x=285, y=190, anchor=tk.CENTER)
-staffLoginButton = tk.Button(staffLoginFrame, text="Log In", bg="white", fg="#4b396e", font=("Times New Roman", 12), cursor="hand2", bd=0, command=staffLoginFunction)
+staffLoginButton = tk.Button(staffLoginFrame, text="Log In", bg="white", fg="#4b396e", font=("Times New Roman", 12),
+                             cursor="hand2", bd=0, command=staffLoginFunction)
 staffLoginButton.place(x=30, y=220, anchor=tk.CENTER)
-staffSignUpButton = tk.Button(staffLoginFrame, text="Don't have an account? Sign up", bg="white", fg="#4b396e", bd=0, cursor="hand2", font=("Times New Roman", 10), command=staffSignUpFunction)
+staffSignUpButton = tk.Button(staffLoginFrame, text="Don't have an account? Sign up", bg="white", fg="#4b396e", bd=0,
+                              cursor="hand2", font=("Times New Roman", 10), command=staffSignUpFunction)
 staffSignUpButton.place(x=95, y=260, anchor=tk.CENTER)
 
 # Student Sign up Frame
-studentSignUpFrame = tk.LabelFrame(root, text="Sign up", bg="white", fg="#83aff7", height=600, width=500, font=("Times New Roman", 20, "bold"))
+studentSignUpFrame = tk.LabelFrame(root, text="Sign up", bg="white", fg="#83aff7", height=600, width=500,
+                                   font=("Times New Roman", 20, "bold"))
 firstNameLabel = tk.Label(studentSignUpFrame, text="Firstname", bg="white", fg="black", font=("Times New Roman", 12))
 firstNameLabel.place(x=100, y=80, anchor=tk.CENTER)
 firstNameEntry = tk.Entry(studentSignUpFrame, width=30, font=("Times New Roman", 12), relief=tk.RAISED, bg="white")
@@ -604,11 +651,13 @@ mobileLabel = tk.Label(studentSignUpFrame, text="Mobile No.", bg="white", fg="bl
 mobileLabel.place(x=96, y=200, anchor=tk.CENTER)
 mobileEntry = tk.Entry(studentSignUpFrame, width=30, font=("Times New Roman", 12), relief=tk.RAISED, bg="white")
 mobileEntry.place(x=290, y=200, anchor=tk.CENTER)
-dateOfBirthLabel = tk.Label(studentSignUpFrame, text="Date of Birth", bg="white", fg="black", font=("Times New Roman", 12))
+dateOfBirthLabel = tk.Label(studentSignUpFrame, text="Date of Birth", bg="white", fg="black",
+                            font=("Times New Roman", 12))
 dateOfBirthLabel.place(x=95, y=240, anchor=tk.CENTER)
 dateOfBirthEntry = DateEntry(studentSignUpFrame, width=42, bg="black", fg="white", year=2000, state="readonly")
 dateOfBirthEntry.place(x=305, y=240, anchor=tk.CENTER)
-securityQuestionsLabel = tk.Label(studentSignUpFrame, text="Security Question", bg="white", fg="black", font=("Times New Roman", 12))
+securityQuestionsLabel = tk.Label(studentSignUpFrame, text="Security Question", bg="white", fg="black",
+                                  font=("Times New Roman", 12))
 securityQuestionsLabel.place(x=82, y=280, anchor=tk.CENTER)
 securityQuestions = ttk.Combobox(studentSignUpFrame, width=30, state="readonly", font=("Times New Roman", 12))
 securityQuestions["values"] = tuple(["What is your lastname?", "What is your Pet name?", "What is your nickname?"])
@@ -616,23 +665,29 @@ securityQuestions.current(0)
 securityQuestions.place(x=300, y=280, anchor=tk.CENTER)
 securityQuesAnsLabel = tk.Label(studentSignUpFrame, text="Answer", fg="black", bg="white", font=("Times New Roman", 12))
 securityQuesAnsLabel.place(x=113, y=320, anchor=tk.CENTER)
-securityQuesAnsEntry = tk.Entry(studentSignUpFrame, width=30, font=("Times New Roman", 12), relief=tk.RAISED, bg="white")
+securityQuesAnsEntry = tk.Entry(studentSignUpFrame, width=30, font=("Times New Roman", 12), relief=tk.RAISED,
+                                bg="white")
 securityQuesAnsEntry.place(x=290, y=320, anchor=tk.CENTER)
 passwordLabel = tk.Label(studentSignUpFrame, text="Password", bg="white", fg="black", font=("Times New Roman", 12))
 passwordLabel.place(x=108, y=360, anchor=tk.CENTER)
 passwordEntry = tk.Entry(studentSignUpFrame, width=30, font=("Times New Roman", 12), relief=tk.RAISED, bg="white")
 passwordEntry.place(x=290, y=360, anchor=tk.CENTER)
-reEntryPasswordLabel = tk.Label(studentSignUpFrame, text="Re-enter Password", bg="white", fg="black", font=("Times New Roman", 12))
+reEntryPasswordLabel = tk.Label(studentSignUpFrame, text="Re-enter Password", bg="white", fg="black",
+                                font=("Times New Roman", 12))
 reEntryPasswordLabel.place(x=80, y=400, anchor=tk.CENTER)
-reEntryPasswordEntry = tk.Entry(studentSignUpFrame, width=30, font=("Times New Roman", 12), relief=tk.RAISED, bg="white")
+reEntryPasswordEntry = tk.Entry(studentSignUpFrame, width=30, font=("Times New Roman", 12), relief=tk.RAISED,
+                                bg="white")
 reEntryPasswordEntry.place(x=290, y=400, anchor=tk.CENTER)
-signUpButton = tk.Button(studentSignUpFrame, text="Sign up", bg="white", fg="black", font=("Times New Roman", 12), cursor="hand2", bd=0, command=StudentSignUpFunction)
+signUpButton = tk.Button(studentSignUpFrame, text="Sign up", bg="white", fg="black", font=("Times New Roman", 12),
+                         cursor="hand2", bd=0, command=StudentSignUpFunction)
 signUpButton.place(x=240, y=440, anchor=tk.CENTER)
-signUpBackButton = tk.Button(studentSignUpFrame, text="Back", fg="black", bg="white", font=("Times New Roman", 12), cursor="hand2", bd=0, command=studentSignUpBackFunction)
+signUpBackButton = tk.Button(studentSignUpFrame, text="Back", fg="black", bg="white", font=("Times New Roman", 12),
+                             cursor="hand2", bd=0, command=studentSignUpBackFunction)
 signUpBackButton.place(x=240, y=480, anchor=tk.CENTER)
 
 # Staff Sign up Frame
-staffSignUpFrame = tk.LabelFrame(root, text="Sign up", bg="white", fg="#83aff7", height=600, width=500, font=("Times New Roman", 20, "bold"))
+staffSignUpFrame = tk.LabelFrame(root, text="Sign up", bg="white", fg="#83aff7", height=600, width=500,
+                                 font=("Times New Roman", 20, "bold"))
 staffFirstNameLabel = tk.Label(staffSignUpFrame, text="Firstname", bg="white", fg="black", font=("Times New Roman", 12))
 staffFirstNameLabel.place(x=100, y=80, anchor=tk.CENTER)
 staffFirstNameEntry = tk.Entry(staffSignUpFrame, width=30, font=("Times New Roman", 12), relief=tk.RAISED, bg="white")
@@ -649,90 +704,121 @@ staffMobileLabel = tk.Label(staffSignUpFrame, text="Mobile No.", bg="white", fg=
 staffMobileLabel.place(x=96, y=200, anchor=tk.CENTER)
 staffMobileEntry = tk.Entry(staffSignUpFrame, width=30, font=("Times New Roman", 12), relief=tk.RAISED, bg="white")
 staffMobileEntry.place(x=290, y=200, anchor=tk.CENTER)
-staffDateOfBirthLabel = tk.Label(staffSignUpFrame, text="Date of Birth", bg="white", fg="black", font=("Times New Roman", 12))
+staffDateOfBirthLabel = tk.Label(staffSignUpFrame, text="Date of Birth", bg="white", fg="black",
+                                 font=("Times New Roman", 12))
 staffDateOfBirthLabel.place(x=95, y=240, anchor=tk.CENTER)
 staffDateOfBirthEntry = DateEntry(staffSignUpFrame, width=42, bg="black", fg="white", year=2000, state="readonly")
 staffDateOfBirthEntry.place(x=305, y=240, anchor=tk.CENTER)
-staffSecurityQuestionsLabel = tk.Label(staffSignUpFrame, text="Security Question", bg="white", fg="black", font=("Times New Roman", 12))
+staffSecurityQuestionsLabel = tk.Label(staffSignUpFrame, text="Security Question", bg="white", fg="black",
+                                       font=("Times New Roman", 12))
 staffSecurityQuestionsLabel.place(x=82, y=280, anchor=tk.CENTER)
 staffSecurityQuestions = ttk.Combobox(staffSignUpFrame, width=30, state="readonly", font=("Times New Roman", 12))
 staffSecurityQuestions["values"] = tuple(["What is your lastname?", "What is your Pet name?", "What is your nickname?"])
 staffSecurityQuestions.current(0)
 staffSecurityQuestions.place(x=300, y=280, anchor=tk.CENTER)
-staffSecurityQuesAnsLabel = tk.Label(staffSignUpFrame, text="Answer", fg="black", bg="white", font=("Times New Roman", 12))
+staffSecurityQuesAnsLabel = tk.Label(staffSignUpFrame, text="Answer", fg="black", bg="white",
+                                     font=("Times New Roman", 12))
 staffSecurityQuesAnsLabel.place(x=113, y=320, anchor=tk.CENTER)
-staffSecurityQuesAnsEntry = tk.Entry(staffSignUpFrame, width=30, font=("Times New Roman", 12), relief=tk.RAISED, bg="white")
+staffSecurityQuesAnsEntry = tk.Entry(staffSignUpFrame, width=30, font=("Times New Roman", 12), relief=tk.RAISED,
+                                     bg="white")
 staffSecurityQuesAnsEntry.place(x=290, y=320, anchor=tk.CENTER)
 stafPasswordLabel = tk.Label(staffSignUpFrame, text="Password", bg="white", fg="black", font=("Times New Roman", 12))
 stafPasswordLabel.place(x=108, y=360, anchor=tk.CENTER)
 stafPasswordEntry = tk.Entry(staffSignUpFrame, width=30, font=("Times New Roman", 12), relief=tk.RAISED, bg="white")
 stafPasswordEntry.place(x=290, y=360, anchor=tk.CENTER)
-staffReEntryPasswordLabel = tk.Label(staffSignUpFrame, text="Re-enter Password", bg="white", fg="black", font=("Times New Roman", 12))
+staffReEntryPasswordLabel = tk.Label(staffSignUpFrame, text="Re-enter Password", bg="white", fg="black",
+                                     font=("Times New Roman", 12))
 staffReEntryPasswordLabel.place(x=80, y=400, anchor=tk.CENTER)
-staffReEntryPasswordEntry = tk.Entry(staffSignUpFrame, width=30, font=("Times New Roman", 12), relief=tk.RAISED, bg="white")
+staffReEntryPasswordEntry = tk.Entry(staffSignUpFrame, width=30, font=("Times New Roman", 12), relief=tk.RAISED,
+                                     bg="white")
 staffReEntryPasswordEntry.place(x=290, y=400, anchor=tk.CENTER)
 staffSubjectLabel = tk.Label(staffSignUpFrame, text="Subject", bg="white", fg="black", font=("Times New Roman", 12))
 staffSubjectLabel.place(x=108, y=440, anchor=tk.CENTER)
 staffSubjectEntry = tk.Entry(staffSignUpFrame, width=30, font=("Times New Roman", 12), relief=tk.RAISED, bg="white")
 staffSubjectEntry.place(x=290, y=440, anchor=tk.CENTER)
-staffSignUpButton = tk.Button(staffSignUpFrame, text="Sign up", bg="white", fg="black", font=("Times New Roman", 12), cursor="hand2", bd=0, command=StaffSignUpFunction)
+staffSignUpButton = tk.Button(staffSignUpFrame, text="Sign up", bg="white", fg="black", font=("Times New Roman", 12),
+                              cursor="hand2", bd=0, command=StaffSignUpFunction)
 staffSignUpButton.place(x=240, y=480, anchor=tk.CENTER)
-staffSignUpBackButton = tk.Button(staffSignUpFrame, text="Back", fg="black", bg="white", font=("Times New Roman", 12), cursor="hand2", bd=0, command=staffSignUpBackFunction)
+staffSignUpBackButton = tk.Button(staffSignUpFrame, text="Back", fg="black", bg="white", font=("Times New Roman", 12),
+                                  cursor="hand2", bd=0, command=staffSignUpBackFunction)
 staffSignUpBackButton.place(x=240, y=520, anchor=tk.CENTER)
 
 # Student Forgot Password Frame
-studentForgotPasswordFrame = tk.LabelFrame(root, text="Forgot Password", bg="white", fg="#83aff7", height=600, width=500, font=("Times New Roman", 20, "bold"))
-sFPSQuesLabel = tk.Label(studentForgotPasswordFrame, text="What is Your lastname?", bg="white", fg="black", font=("Times New Roman", 12))
+studentForgotPasswordFrame = tk.LabelFrame(root, text="Forgot Password", bg="white", fg="#83aff7", height=600,
+                                           width=500, font=("Times New Roman", 20, "bold"))
+sFPSQuesLabel = tk.Label(studentForgotPasswordFrame, text="What is Your lastname?", bg="white", fg="black",
+                         font=("Times New Roman", 12))
 sFPSQuesLabel.place(x=240, y=80, anchor=tk.CENTER)
-sFPSAnsEntry = tk.Entry(studentForgotPasswordFrame, width=30, font=("Times New Roman", 12), relief=tk.RAISED, bg="white")
+sFPSAnsEntry = tk.Entry(studentForgotPasswordFrame, width=30, font=("Times New Roman", 12), relief=tk.RAISED,
+                        bg="white")
 sFPSAnsEntry.place(x=240, y=120, anchor=tk.CENTER)
-sFPSubmitButton = tk.Button(studentForgotPasswordFrame, text="Submit", fg="black", bg="white", bd=0, cursor="hand2", font=("Times New Roman", 12), command=studentForgotPasswordSubmitFunction)
+sFPSubmitButton = tk.Button(studentForgotPasswordFrame, text="Submit", fg="black", bg="white", bd=0, cursor="hand2",
+                            font=("Times New Roman", 12), command=studentForgotPasswordSubmitFunction)
 sFPSubmitButton.place(x=240, y=160, anchor=tk.CENTER)
-sFPBackButton = tk.Button(studentForgotPasswordFrame, text="Back", bg="white", fg="black", font=("Times New Roman", 12), bd=0, cursor="hand2", command=studentForgotPasswordBackFunction)
+sFPBackButton = tk.Button(studentForgotPasswordFrame, text="Back", bg="white", fg="black", font=("Times New Roman", 12),
+                          bd=0, cursor="hand2", command=studentForgotPasswordBackFunction)
 sFPBackButton.place(x=240, y=200, anchor=tk.CENTER)
 
 # Student Password Reset Frame
-studentPasswordResetFrame = tk.LabelFrame(root, text="Reset Password", bg="white", fg="#83aff7", height=600, width=500, font=("Times New Roman", 20, "bold"))
-sPRPasswordLabel = tk.Label(studentPasswordResetFrame, text="Enter the password below", bg="white", fg="black", font=("Times New Roman", 12))
+studentPasswordResetFrame = tk.LabelFrame(root, text="Reset Password", bg="white", fg="#83aff7", height=600, width=500,
+                                          font=("Times New Roman", 20, "bold"))
+sPRPasswordLabel = tk.Label(studentPasswordResetFrame, text="Enter the password below", bg="white", fg="black",
+                            font=("Times New Roman", 12))
 sPRPasswordLabel.place(x=240, y=80, anchor=tk.CENTER)
-sPRPasswordEntry1 = tk.Entry(studentPasswordResetFrame, width=30, font=("Times New Roman", 12), relief=tk.RAISED, bg="white")
+sPRPasswordEntry1 = tk.Entry(studentPasswordResetFrame, width=30, font=("Times New Roman", 12), relief=tk.RAISED,
+                             bg="white")
 sPRPasswordEntry1.place(x=240, y=120, anchor=tk.CENTER)
-sPRPasswordEntry2 = tk.Entry(studentPasswordResetFrame, width=30, font=("Times New Roman", 12), relief=tk.RAISED, bg="white")
+sPRPasswordEntry2 = tk.Entry(studentPasswordResetFrame, width=30, font=("Times New Roman", 12), relief=tk.RAISED,
+                             bg="white")
 sPRPasswordEntry2.place(x=240, y=160, anchor=tk.CENTER)
-sPRConfirmButton = tk.Button(studentPasswordResetFrame, text="Confirm", bg="white", fg="black", bd=0, cursor="hand2", font=("Times New Roman", 12), command=studentResetPasswordConfirmFunction)
+sPRConfirmButton = tk.Button(studentPasswordResetFrame, text="Confirm", bg="white", fg="black", bd=0, cursor="hand2",
+                             font=("Times New Roman", 12), command=studentResetPasswordConfirmFunction)
 sPRConfirmButton.place(x=240, y=200, anchor=tk.CENTER)
-sPRBackButton = tk.Button(studentPasswordResetFrame, text="Back", bg="white", fg="black", bd=0, cursor="hand2", font=("Times New Roman", 12), command=studentResetPasswordBackFunction)
+sPRBackButton = tk.Button(studentPasswordResetFrame, text="Back", bg="white", fg="black", bd=0, cursor="hand2",
+                          font=("Times New Roman", 12), command=studentResetPasswordBackFunction)
 sPRBackButton.place(x=240, y=240, anchor=tk.CENTER)
 
 # Staff Forgot Password Frame
-staffForgotPasswordFrame = tk.LabelFrame(root, text="Forgot Password", bg="white", fg="#83aff7", height=600, width=500, font=("Times New Roman", 20, "bold"))
-SFPSQuesLabel = tk.Label(staffForgotPasswordFrame, text="What is Your lastname?", bg="white", fg="black", font=("Times New Roman", 12))
+staffForgotPasswordFrame = tk.LabelFrame(root, text="Forgot Password", bg="white", fg="#83aff7", height=600, width=500,
+                                         font=("Times New Roman", 20, "bold"))
+SFPSQuesLabel = tk.Label(staffForgotPasswordFrame, text="What is Your lastname?", bg="white", fg="black",
+                         font=("Times New Roman", 12))
 SFPSQuesLabel.place(x=240, y=80, anchor=tk.CENTER)
 SFPSAnsEntry = tk.Entry(staffForgotPasswordFrame, width=30, font=("Times New Roman", 12), relief=tk.RAISED, bg="white")
 SFPSAnsEntry.place(x=240, y=120, anchor=tk.CENTER)
-SFPSubmitButton = tk.Button(staffForgotPasswordFrame, text="Submit", fg="black", bg="white", bd=0, cursor="hand2", font=("Times New Roman", 12), command=staffForgotPasswordSubmitFunction)
+SFPSubmitButton = tk.Button(staffForgotPasswordFrame, text="Submit", fg="black", bg="white", bd=0, cursor="hand2",
+                            font=("Times New Roman", 12), command=staffForgotPasswordSubmitFunction)
 SFPSubmitButton.place(x=240, y=160, anchor=tk.CENTER)
-SFPBackButton = tk.Button(staffForgotPasswordFrame, text="Back", bg="white", fg="black", font=("Times New Roman", 12), bd=0, cursor="hand2", command=staffForgotPasswordBackFunction)
+SFPBackButton = tk.Button(staffForgotPasswordFrame, text="Back", bg="white", fg="black", font=("Times New Roman", 12),
+                          bd=0, cursor="hand2", command=staffForgotPasswordBackFunction)
 SFPBackButton.place(x=240, y=200, anchor=tk.CENTER)
 
 # Staff Password Reset Frame
-staffPasswordResetFrame = tk.LabelFrame(root, text="Reset Password", bg="white", fg="#83aff7", height=600, width=500, font=("Times New Roman", 20, "bold"))
-SPRPasswordLabel = tk.Label(staffPasswordResetFrame, text="Enter the password below", bg="white", fg="black", font=("Times New Roman", 12))
+staffPasswordResetFrame = tk.LabelFrame(root, text="Reset Password", bg="white", fg="#83aff7", height=600, width=500,
+                                        font=("Times New Roman", 20, "bold"))
+SPRPasswordLabel = tk.Label(staffPasswordResetFrame, text="Enter the password below", bg="white", fg="black",
+                            font=("Times New Roman", 12))
 SPRPasswordLabel.place(x=240, y=80, anchor=tk.CENTER)
-SPRPasswordEntry1 = tk.Entry(staffPasswordResetFrame, width=30, font=("Times New Roman", 12), relief=tk.RAISED, bg="white")
+SPRPasswordEntry1 = tk.Entry(staffPasswordResetFrame, width=30, font=("Times New Roman", 12), relief=tk.RAISED,
+                             bg="white")
 SPRPasswordEntry1.place(x=240, y=120, anchor=tk.CENTER)
-SPRPasswordEntry2 = tk.Entry(staffPasswordResetFrame, width=30, font=("Times New Roman", 12), relief=tk.RAISED, bg="white")
+SPRPasswordEntry2 = tk.Entry(staffPasswordResetFrame, width=30, font=("Times New Roman", 12), relief=tk.RAISED,
+                             bg="white")
 SPRPasswordEntry2.place(x=240, y=160, anchor=tk.CENTER)
-SPRConfirmButton = tk.Button(staffPasswordResetFrame, text="Confirm", bg="white", fg="black", bd=0, cursor="hand2", font=("Times New Roman", 12), command=staffResetPasswordConfirmFunction)
+SPRConfirmButton = tk.Button(staffPasswordResetFrame, text="Confirm", bg="white", fg="black", bd=0, cursor="hand2",
+                             font=("Times New Roman", 12), command=staffResetPasswordConfirmFunction)
 SPRConfirmButton.place(x=240, y=200, anchor=tk.CENTER)
-SPRBackButton = tk.Button(staffPasswordResetFrame, text="Back", bg="white", fg="black", bd=0, cursor="hand2", font=("Times New Roman", 12), command=staffResetPasswordBackFunction)
+SPRBackButton = tk.Button(staffPasswordResetFrame, text="Back", bg="white", fg="black", bd=0, cursor="hand2",
+                          font=("Times New Roman", 12), command=staffResetPasswordBackFunction)
 SPRBackButton.place(x=240, y=240, anchor=tk.CENTER)
 
 # Staff Inside Login Frame
-staffInsideLoginFrame = tk.LabelFrame(root, text="Data Manipulation", bg="white", fg="#83aff7", height=700, width=1200, font=("Times New Roman", 20, "bold"))
+staffInsideLoginFrame = tk.LabelFrame(root, text="Data Manipulation", bg="white", fg="#83aff7", height=700, width=1200,
+                                      font=("Times New Roman", 20, "bold"))
 sILInfoLabel = tk.Label(staffInsideLoginFrame, text="", bg="white", fg="black", font=("Times New Roman", 15))
 sILInfoLabel.place(x=600, y=30, anchor=tk.CENTER)
-sILQuestionLabel = tk.Label(staffInsideLoginFrame, text="Question", bg="white", fg="black", font=("Times New Roman", 12))
+sILQuestionLabel = tk.Label(staffInsideLoginFrame, text="Question", bg="white", fg="black",
+                            font=("Times New Roman", 12))
 sILQuestionLabel.place(x=100, y=120, anchor=tk.CENTER)
 sILQuestionEntry = tk.Entry(staffInsideLoginFrame, width=50, font=("Times New Roman", 12), relief=tk.RAISED, bg="white")
 sILQuestionEntry.place(x=380, y=120, anchor=tk.CENTER)
@@ -756,14 +842,38 @@ sILAnswerLabel = tk.Label(staffInsideLoginFrame, text="Answer", bg="white", fg="
 sILAnswerLabel.place(x=100, y=320, anchor=tk.CENTER)
 sILAnswerEntry = tk.Entry(staffInsideLoginFrame, width=30, bg="white", relief=tk.RAISED, font=("Times New Roman", 12))
 sILAnswerEntry.place(x=300, y=320, anchor=tk.CENTER)
-sILAddButton = tk.Button(staffInsideLoginFrame, text="Add", bg="white", fg="green", bd=0, font=("Times New Roman", 12), cursor="hand2", command=staffInsideLoginAddFunction)
+sILAddButton = tk.Button(staffInsideLoginFrame, text="Add", bg="white", fg="green", bd=0, font=("Times New Roman", 12),
+                         cursor="hand2", command=staffInsideLoginAddFunction)
 sILAddButton.place(x=100, y=360, anchor=tk.CENTER)
-sILUpdateButton = tk.Button(staffInsideLoginFrame, text="Update", bg="white", fg="blue", bd=0, font=("Times New Roman", 12), cursor="hand2", command=staffInsideLoginUpdateFunction)
+sILUpdateButton = tk.Button(staffInsideLoginFrame, text="Update", bg="white", fg="blue", bd=0,
+                            font=("Times New Roman", 12), cursor="hand2", command=staffInsideLoginUpdateFunction)
 sILUpdateButton.place(x=200, y=360, anchor=tk.CENTER)
-sILDeleteButton = tk.Button(staffInsideLoginFrame, text="Delete", bg="white", fg="red", bd=0, font=("Times New Roman", 12), cursor="hand2", command=staffInsideLoginDeleteFunction)
+sILDeleteButton = tk.Button(staffInsideLoginFrame, text="Delete", bg="white", fg="red", bd=0,
+                            font=("Times New Roman", 12), cursor="hand2", command=staffInsideLoginDeleteFunction)
 sILDeleteButton.place(x=300, y=360, anchor=tk.CENTER)
-sILShowAllButton = tk.Button(staffInsideLoginFrame, text="Show All", bg="white", fg="Purple", bd=0, font=("Times New Roman", 12), cursor="hand2", command=staffInsideLoginShowAllFunction)
+sILShowAllButton = tk.Button(staffInsideLoginFrame, text="Show All", bg="white", fg="Purple", bd=0,
+                             font=("Times New Roman", 12), cursor="hand2", command=staffInsideLoginShowAllFunction)
 sILShowAllButton.place(x=400, y=360, anchor=tk.CENTER)
-sILLogoutButton = tk.Button(staffInsideLoginFrame, text="Log out", bg="white", fg="black", bd=0, font=("Times New Roman", 12), cursor="hand2", command=staffInsideLogoutFunction)
+sILLogoutButton = tk.Button(staffInsideLoginFrame, text="Log out", bg="white", fg="black", bd=0,
+                            font=("Times New Roman", 12), cursor="hand2", command=staffInsideLogoutFunction)
 sILLogoutButton.place(x=1150, y=5, anchor=tk.CENTER)
+
+# Student Inside Login Frame
+
+studentInsideLoginFrame = tk.LabelFrame(root, text="Quiz", bg="white", fg="#83aff7", height=700, width=1200,
+                                        font=("Times New Roman", 20, "bold"))
+studentILInfoLabel = tk.Label(studentInsideLoginFrame, text="", bg="white", fg="black", font=("Times New Roman", 15))
+studentILInfoLabel.place(x=600, y=10, anchor=tk.CENTER)
+studentILSubjectLabel = tk.Label(studentInsideLoginFrame, text="Subject", bg="white", fg="black",
+                                 font=("Times New Roman", 15))
+studentILSubjectLabel.place(x=50, y=30, anchor=tk.CENTER)
+studentILSubjectCombobox = ttk.Combobox(studentInsideLoginFrame, width=30, state="readonly",
+                                        font=("Times New Roman", 12))
+studentILSubjectCombobox.place(x=150, y=70, anchor=tk.CENTER)
+studentILSubjectOkButton = tk.Button(studentInsideLoginFrame, text="Ok", bg="white", fg="black", bd=0, cursor="hand2",
+                                     font=("Times New Roman", 12), command=studentInsideLoginOkFunction)
+studentILSubjectOkButton.place(x=320, y=70, anchor=tk.CENTER)
+studentILLogoutButton = tk.Button(studentInsideLoginFrame, text="Log out", bg="white", fg="black", bd=0,
+                                  font=("Times New Roman", 12), cursor="hand2", command=studentInsideLogoutFunction)
+studentILLogoutButton.place(x=1150, y=5, anchor=tk.CENTER)
 root.mainloop()
