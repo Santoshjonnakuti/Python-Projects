@@ -59,6 +59,8 @@ def getAllQuestion(subject):
     cur.execute('''SELECT * FROM {}'''.format(subject))
     questions = cur.fetchall()
     questionList = []
+    i = 1
     for question in questions:
-        questionList.append([question[0], question[1], question[2], question[3], question[4], question[5]])
+        questionList.append([i, question[0], question[1], question[2], question[3], question[4], question[5]])
+        i += 1
     return questionList
