@@ -8,6 +8,10 @@ import StaffDataBase
 import SubjectDataBase
 
 global name, staffName
+global questionIndex, questionsList
+global presentQuestion
+global answerList
+previousQuestion = None
 
 
 def studentShowPasswordFunction():
@@ -224,20 +228,99 @@ def studentResetPasswordConfirmFunction():
 
 
 def studentInsideLoginOkFunction():
+    studentILSubjectOkButton["state"] = tk.DISABLED
+    global presentQuestion, questionIndex, questionsList
     studentSubject = studentILSubjectCombobox.get()
     if studentSubject == "" or studentSubject is None:
         messagebox.showerror("Error", "Please Select Subject...")
         return
     else:
         questionsList = SubjectDataBase.getAllQuestion(studentSubject)
-        print(questionsList)
+        questionIndex = 0
+        presentQuestion = questionsList[questionIndex]
+        studentInsideLoginQuestionFrame.place(x=350, y=380, anchor=tk.CENTER)
+        studentILPresentQuestionLabel["text"] = str(presentQuestion[0]) + ". " + presentQuestion[1]
+        studentILRadioButton1["text"] = presentQuestion[2]
+        studentILRadioButton2["text"] = presentQuestion[3]
+        studentILRadioButton3["text"] = presentQuestion[4]
+        studentILRadioButton4["text"] = presentQuestion[5]
+        studentILPresentQuestionLabel.place(x=0, y=20)
+        studentILSubmitButton.place(x=1100, y=600)
         return
 
 
+def studentInsideSubmitFunction():
+    global answerList
+    print(answerList)
+    return
+
+
+def studentInsideLoginNextFunction():
+    global questionIndex, questionsList, presentQuestion, answerList
+    if questionIndex != len(questionsList) - 1:
+        questionIndex += 1
+    else:
+        messagebox.showinfo("Information!", "This is the last question...")
+        answerList.append(variable.get())
+        return
+    presentQuestion = questionsList[questionIndex]
+    studentILPresentQuestionLabel["text"] = str(presentQuestion[0]) + ". " + presentQuestion[1]
+    studentILRadioButton1["text"] = presentQuestion[2]
+    studentILRadioButton2["text"] = presentQuestion[3]
+    studentILRadioButton3["text"] = presentQuestion[4]
+    studentILRadioButton4["text"] = presentQuestion[5]
+    if len(answerList) >= presentQuestion[0] - 1:
+        answerList[presentQuestion[0] - 2] = variable.get()
+        try:
+            variable.set(answerList[presentQuestion[0] - 1])
+        except IndexError:
+            variable.set(None)
+    else:
+        answerList.append(variable.get())
+        variable.set(None)
+    return
+
+
+def studentInsideLoginPreviousFunction():
+    global questionIndex, questionsList, presentQuestion, answerList
+    if questionIndex != 0:
+        questionIndex -= 1
+    else:
+        messagebox.showinfo("Information!", "This is the First question...")
+    presentQuestion = questionsList[questionIndex]
+    studentILPresentQuestionLabel["text"] = str(presentQuestion[0]) + ". " + presentQuestion[1]
+    studentILRadioButton1["text"] = presentQuestion[2]
+    studentILRadioButton2["text"] = presentQuestion[3]
+    studentILRadioButton3["text"] = presentQuestion[4]
+    studentILRadioButton4["text"] = presentQuestion[5]
+    if len(answerList) >= presentQuestion[0] - 1:
+        try:
+            variable.set(answerList[presentQuestion[0] - 1])
+        except IndexError:
+            return
+    else:
+        answerList.append(variable.get())
+        variable.set(None)
+    return
+
+
+def studentInsideLoginClearFunction():
+    global answerList, presentQuestion
+    answerList[presentQuestion[0] - 1] = "None"
+    variable.set(None)
+    return
+
+
 def studentInsideLogoutFunction():
+    global answerList
     studentInsideLoginFrame.place_forget()
     studentUsernameEntry.delete(0, tk.END)
     studentPasswordEntry.delete(0, tk.END)
+    studentILSubjectOkButton["state"] = tk.ACTIVE
+    studentInsideLoginClearFunction()
+    studentInsideLoginQuestionFrame.place_forget()
+    studentILSubjectCombobox.current(None)
+    answerList.clear()
     studentLoginFrame.place(x=400, y=400, anchor=tk.CENTER)
     staffLoginFrame.place(x=1100, y=400, anchor=tk.CENTER)
     return
@@ -572,6 +655,7 @@ root.title("Quiz")
 root.iconbitmap("Icon.ico")
 bgImage = ImageTk.PhotoImage(Image.open("Background.jpg"))
 bgLabel = tk.Label(root, image=bgImage).pack()
+answerList = []
 
 # Student Login Frame
 studentLoginFrame = tk.LabelFrame(root, text="Student Login", bg="white", fg="#83aff7", height=600, width=500,
@@ -873,7 +957,39 @@ studentILSubjectCombobox.place(x=150, y=70, anchor=tk.CENTER)
 studentILSubjectOkButton = tk.Button(studentInsideLoginFrame, text="Ok", bg="white", fg="black", bd=0, cursor="hand2",
                                      font=("Times New Roman", 12), command=studentInsideLoginOkFunction)
 studentILSubjectOkButton.place(x=320, y=70, anchor=tk.CENTER)
+studentILSubmitButton = tk.Button(studentInsideLoginFrame, text="Submit", bg="white", fg="black", bd=0, cursor="hand2",
+                                  font=("Times New Roman", 12), command=studentInsideSubmitFunction)
 studentILLogoutButton = tk.Button(studentInsideLoginFrame, text="Log out", bg="white", fg="black", bd=0,
                                   font=("Times New Roman", 12), cursor="hand2", command=studentInsideLogoutFunction)
 studentILLogoutButton.place(x=1150, y=5, anchor=tk.CENTER)
+
+# Student Inside Login Question Frame
+
+studentInsideLoginQuestionFrame = tk.LabelFrame(studentInsideLoginFrame, text="Question", bg="white", fg="#83aaf7",
+                                                height=500, width=700, font=("Times New Roman", 15))
+studentILPresentQuestionLabel = tk.Label(studentInsideLoginQuestionFrame, text="", bg="white", fg="black",
+                                         font=("Times New Roman", 12))
+studentILNextButton = tk.Button(studentInsideLoginQuestionFrame, text="Next >>", bg="white", fg="black", bd=0,
+                                font=("Times New Roman", 12), cursor="hand2", command=studentInsideLoginNextFunction)
+studentILNextButton.place(x=633, y=445)
+studentILPreviousButton = tk.Button(studentInsideLoginQuestionFrame, text="<< Previous", bg="white", fg="black", bd=0,
+                                    font=("Times New Roman", 12), cursor="hand2",
+                                    command=studentInsideLoginPreviousFunction)
+studentILPreviousButton.place(x=0, y=445)
+variable = tk.StringVar(studentInsideLoginQuestionFrame, "0")
+studentILRadioButton1 = tk.Radiobutton(studentInsideLoginQuestionFrame, variable=variable, value=1, padx=0, pady=0,
+                                       text="", bg="white", cursor="hand2")
+studentILRadioButton1.place(x=0, y=120)
+studentILRadioButton2 = tk.Radiobutton(studentInsideLoginQuestionFrame, variable=variable, value=2, padx=0, pady=0,
+                                       text="", bg="white", cursor="hand2")
+studentILRadioButton2.place(x=0, y=200)
+studentILRadioButton3 = tk.Radiobutton(studentInsideLoginQuestionFrame, variable=variable, value=3, padx=0, pady=0,
+                                       text="", bg="white", cursor="hand2")
+studentILRadioButton3.place(x=0, y=280)
+studentILRadioButton4 = tk.Radiobutton(studentInsideLoginQuestionFrame, variable=variable, value=4, padx=0, pady=0,
+                                       text="", bg="white", cursor="hand2")
+studentILRadioButton4.place(x=0, y=360)
+studentILClearButton = tk.Button(studentInsideLoginQuestionFrame, text="Clear", bg="white", fg="black", bd=0,
+                                 font=("Times New Roman", 12), cursor="hand2", command=studentInsideLoginClearFunction)
+studentILClearButton.place(x=560, y=445)
 root.mainloop()
