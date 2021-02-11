@@ -14,7 +14,7 @@ global answerList
 previousQuestion = None
 
 
-def studentShowPasswordFunction():
+def studentShowPasswordFunction(event=None):
     if studentShowPasswordButton["text"] == "Show Password":
         studentShowPasswordButton.config(text="Hide Password")
         studentPasswordEntry.config(show="")
@@ -24,14 +24,14 @@ def studentShowPasswordFunction():
     return
 
 
-def studentSignUpFunction():
+def studentSignUpFunction(event=None):
     studentLoginFrame.place_forget()
     staffLoginFrame.place_forget()
     studentSignUpFrame.place(x=700, y=400, anchor=tk.CENTER)
     return
 
 
-def studentLoginFunction():
+def studentLoginFunction(event=None):
     global name
     username = studentUsernameEntry.get()
     password = studentPasswordEntry.get()
@@ -57,7 +57,7 @@ def studentLoginFunction():
     return
 
 
-def StudentSignUpFunction():
+def StudentSignUpFunction(event=None):
     fName = firstNameEntry.get()
     lName = lastNameEntry.get()
     emailId = emailIdEntry.get()
@@ -126,14 +126,14 @@ def StudentSignUpFunction():
     return
 
 
-def studentSignUpBackFunction():
+def studentSignUpBackFunction(event=None):
     studentSignUpFrame.place_forget()
     studentLoginFrame.place(x=400, y=400, anchor=tk.CENTER)
     staffLoginFrame.place(x=1100, y=400, anchor=tk.CENTER)
     return
 
 
-def studentForgotPasswordFunction():
+def studentForgotPasswordFunction(event=None):
     global name
     uName = studentUsernameEntry.get()
     if uName == "":
@@ -152,14 +152,14 @@ def studentForgotPasswordFunction():
     return
 
 
-def studentForgotPasswordBackFunction():
+def studentForgotPasswordBackFunction(event=None):
     studentForgotPasswordFrame.place_forget()
     studentLoginFrame.place(x=400, y=400, anchor=tk.CENTER)
     staffLoginFrame.place(x=1100, y=400, anchor=tk.CENTER)
     return
 
 
-def studentForgotPasswordSubmitFunction():
+def studentForgotPasswordSubmitFunction(event=None):
     ans = sFPSAnsEntry.get()
     if ans == "":
         messagebox.showerror("Error", "Please Input the Answer...")
@@ -173,13 +173,13 @@ def studentForgotPasswordSubmitFunction():
     return
 
 
-def studentResetPasswordBackFunction():
+def studentResetPasswordBackFunction(event=None):
     studentPasswordResetFrame.place_forget()
     studentForgotPasswordFrame.place(x=700, y=400, anchor=tk.CENTER)
     return
 
 
-def studentResetPasswordConfirmFunction():
+def studentResetPasswordConfirmFunction(event=None):
     pwd1 = sPRPasswordEntry1.get()
     pwd2 = sPRPasswordEntry2.get()
     if pwd1 == "" or pwd2 == "":
@@ -227,15 +227,18 @@ def studentResetPasswordConfirmFunction():
     return
 
 
-def studentInsideLoginOkFunction():
+def studentInsideLoginOkFunction(event=None):
     studentILSubjectOkButton["state"] = tk.DISABLED
-    global presentQuestion, questionIndex, questionsList
+    global presentQuestion, questionIndex, questionsList, answerList
     studentSubject = studentILSubjectCombobox.get()
     if studentSubject == "" or studentSubject is None:
         messagebox.showerror("Error", "Please Select Subject...")
         return
     else:
         questionsList = SubjectDataBase.getAllQuestion(studentSubject)
+        answerList = [None for _ in range(0, len(questionsList) + 1)]
+        print(len(answerList))
+        print(answerList)
         questionIndex = 0
         presentQuestion = questionsList[questionIndex]
         studentInsideLoginQuestionFrame.place(x=350, y=380, anchor=tk.CENTER)
@@ -249,19 +252,22 @@ def studentInsideLoginOkFunction():
         return
 
 
-def studentInsideSubmitFunction():
+def studentInsideSubmitFunction(event=None):
     global answerList
-    print(answerList)
+    yesNo = messagebox.askyesno("Submit", "Do you want to submit\nOnce submitted answers cannot be changed...")
+    if yesNo is True:
+        print(answerList)
+    else:
+        return
     return
 
 
-def studentInsideLoginNextFunction():
+def studentInsideLoginNextFunction(event=None):
     global questionIndex, questionsList, presentQuestion, answerList
     if questionIndex != len(questionsList) - 1:
         questionIndex += 1
     else:
         messagebox.showinfo("Information!", "This is the last question...")
-        answerList.append(variable.get())
         return
     presentQuestion = questionsList[questionIndex]
     studentILPresentQuestionLabel["text"] = str(presentQuestion[0]) + ". " + presentQuestion[1]
@@ -269,49 +275,50 @@ def studentInsideLoginNextFunction():
     studentILRadioButton2["text"] = presentQuestion[3]
     studentILRadioButton3["text"] = presentQuestion[4]
     studentILRadioButton4["text"] = presentQuestion[5]
-    if len(answerList) >= presentQuestion[0] - 1:
-        answerList[presentQuestion[0] - 2] = variable.get()
-        try:
-            variable.set(answerList[presentQuestion[0] - 1])
-        except IndexError:
-            variable.set(None)
-    else:
-        answerList.append(variable.get())
+    if answerList[presentQuestion[0]] is None or answerList[presentQuestion[0]] == "0":
         variable.set(None)
+    else:
+        variable.set(answerList[presentQuestion[0]])
     return
 
 
-def studentInsideLoginPreviousFunction():
+def studentInsideLoginPreviousFunction(event=None):
     global questionIndex, questionsList, presentQuestion, answerList
     if questionIndex != 0:
         questionIndex -= 1
     else:
         messagebox.showinfo("Information!", "This is the First question...")
+        return
     presentQuestion = questionsList[questionIndex]
     studentILPresentQuestionLabel["text"] = str(presentQuestion[0]) + ". " + presentQuestion[1]
     studentILRadioButton1["text"] = presentQuestion[2]
     studentILRadioButton2["text"] = presentQuestion[3]
     studentILRadioButton3["text"] = presentQuestion[4]
     studentILRadioButton4["text"] = presentQuestion[5]
-    if len(answerList) >= presentQuestion[0] - 1:
-        try:
-            variable.set(answerList[presentQuestion[0] - 1])
-        except IndexError:
-            return
-    else:
-        answerList.append(variable.get())
+    if answerList[presentQuestion[0]] is None or answerList[presentQuestion[0]] == "0":
         variable.set(None)
+    else:
+        variable.set(answerList[presentQuestion[0]])
     return
 
 
-def studentInsideLoginClearFunction():
+def studentInsideLoginClearFunction(event=None):
     global answerList, presentQuestion
-    answerList[presentQuestion[0] - 1] = "None"
-    variable.set(None)
+    answerList[presentQuestion[0]] = "0"
+    variable.set("0")
+    print(answerList)
     return
 
 
-def studentInsideLogoutFunction():
+def studentInsideLoginSaveFunction(event=None):
+    global presentQuestion, answerList
+    print(presentQuestion[0])
+    answerList[presentQuestion[0]] = variable.get()
+    print(answerList)
+    return
+
+
+def studentInsideLogoutFunction(event=None):
     global answerList
     studentInsideLoginFrame.place_forget()
     studentUsernameEntry.delete(0, tk.END)
@@ -326,7 +333,7 @@ def studentInsideLogoutFunction():
     return
 
 
-def staffShowPasswordFunction():
+def staffShowPasswordFunction(event=None):
     if staffShowPasswordButton["text"] == "Show Password":
         staffShowPasswordButton.config(text="Hide Password")
         staffPasswordEntry.config(show="")
@@ -336,14 +343,14 @@ def staffShowPasswordFunction():
     return
 
 
-def staffSignUpFunction():
+def staffSignUpFunction(event=None):
     studentLoginFrame.place_forget()
     staffLoginFrame.place_forget()
     staffSignUpFrame.place(x=700, y=400, anchor=tk.CENTER)
     return
 
 
-def staffLoginFunction():
+def staffLoginFunction(event=None):
     global staffName
     username = staffUsernameEntry.get()
     password = staffPasswordEntry.get()
@@ -357,11 +364,10 @@ def staffLoginFunction():
             staffName = username
             subject = StaffDataBase.getSubject(staffName)
             user = StaffDataBase.getName(staffName)
-            sILInfoLabel[
-                "text"] = '''Welcome {},\nYou Can add delete update Questions from your corresponding subject...\nNote : Subject is {}'''.format(
-                user, subject)
+            sILInfoLabel["text"] = '''Welcome {},\nYou Can add delete update Questions from your corresponding subject...\nNote : Subject is {}'''.format(user, subject)
             studentLoginFrame.place_forget()
             staffLoginFrame.place_forget()
+            sILNoteLabel["text"] = '''Note : Answer should be either 1 or 2 or 3 or 4...\nTo Add/Update a question all fields are compulsory...\nTo Delete a question only question field is compulsory...'''
             staffInsideLoginFrame.place(x=750, y=400, anchor=tk.CENTER)
         elif pwd is None:
             messagebox.showerror("Error", "Staff not found...")
@@ -370,7 +376,7 @@ def staffLoginFunction():
     return
 
 
-def StaffSignUpFunction():
+def StaffSignUpFunction(event=None):
     sFName = staffFirstNameEntry.get()
     sLName = staffLastNameEntry.get()
     sEmailId = staffEmailIdEntry.get()
@@ -455,14 +461,14 @@ def StaffSignUpFunction():
     return
 
 
-def staffSignUpBackFunction():
+def staffSignUpBackFunction(event=None):
     staffSignUpFrame.place_forget()
     studentLoginFrame.place(x=400, y=400, anchor=tk.CENTER)
     staffLoginFrame.place(x=1100, y=400, anchor=tk.CENTER)
     return
 
 
-def staffForgotPasswordFunction():
+def staffForgotPasswordFunction(event=None):
     global staffName
     uName = staffUsernameEntry.get()
     if uName == "":
@@ -481,14 +487,14 @@ def staffForgotPasswordFunction():
     return
 
 
-def staffForgotPasswordBackFunction():
+def staffForgotPasswordBackFunction(event=None):
     staffForgotPasswordFrame.place_forget()
     studentLoginFrame.place(x=400, y=400, anchor=tk.CENTER)
     staffLoginFrame.place(x=1100, y=400, anchor=tk.CENTER)
     return
 
 
-def staffForgotPasswordSubmitFunction():
+def staffForgotPasswordSubmitFunction(event=None):
     ans = SFPSAnsEntry.get()
     if ans == "":
         messagebox.showerror("Error", "Please Input the Answer...")
@@ -502,13 +508,13 @@ def staffForgotPasswordSubmitFunction():
     return
 
 
-def staffResetPasswordBackFunction():
+def staffResetPasswordBackFunction(event=None):
     staffPasswordResetFrame.place_forget()
     staffForgotPasswordFrame.place(x=700, y=400, anchor=tk.CENTER)
     return
 
 
-def staffResetPasswordConfirmFunction():
+def staffResetPasswordConfirmFunction(event=None):
     pwd1 = SPRPasswordEntry1.get()
     pwd2 = SPRPasswordEntry2.get()
     if pwd1 == "" or pwd2 == "":
@@ -556,7 +562,7 @@ def staffResetPasswordConfirmFunction():
     return
 
 
-def staffInsideLoginAddFunction():
+def staffInsideLoginAddFunction(event=None):
     ques = sILQuestionEntry.get()
     op1 = sILOption1Entry.get()
     op2 = sILOption2Entry.get()
@@ -566,8 +572,8 @@ def staffInsideLoginAddFunction():
     if ques == "" or op1 == "" or op2 == "" or op3 == "" or op4 == "" or ans == "":
         messagebox.showerror("Error", "All Fields are compulsory...")
         return
-    if ans != op1 and ans != op2 and ans != op3 and ans != op4:
-        messagebox.showerror("Error", "Answer is not listed in options...")
+    if ans != "1" and ans != "2" and ans != "3" and ans != "4":
+        messagebox.showerror("Error", "Answer should be either 1 or 2 or 3 or 4...")
         return
     Subject = StaffDataBase.getSubject(staffName)
     SubjectDataBase.addQuestion(Subject, ques, op1, op2, op3, op4, ans)
@@ -581,7 +587,7 @@ def staffInsideLoginAddFunction():
     return
 
 
-def staffInsideLoginUpdateFunction():
+def staffInsideLoginUpdateFunction(event=None):
     ques = sILQuestionEntry.get()
     op1 = sILOption1Entry.get()
     op2 = sILOption2Entry.get()
@@ -603,7 +609,7 @@ def staffInsideLoginUpdateFunction():
     return
 
 
-def staffInsideLoginDeleteFunction():
+def staffInsideLoginDeleteFunction(event=None):
     ques = sILQuestionEntry.get()
     if ques == "":
         messagebox.showerror("Error", "Please Enter Question...")
@@ -620,7 +626,7 @@ def staffInsideLoginDeleteFunction():
     return
 
 
-def staffInsideLoginShowAllFunction():
+def staffInsideLoginShowAllFunction(event=None):
     nWindow = tk.Tk()
     nWindow.title("Questions")
     nWindow.iconbitmap("Icon.ico")
@@ -634,7 +640,7 @@ def staffInsideLoginShowAllFunction():
     return
 
 
-def staffInsideLogoutFunction():
+def staffInsideLogoutFunction(event=None):
     staffInsideLoginFrame.place_forget()
     staffUsernameEntry.delete(0, tk.END)
     staffPasswordEntry.delete(0, tk.END)
@@ -655,7 +661,6 @@ root.title("Quiz")
 root.iconbitmap("Icon.ico")
 bgImage = ImageTk.PhotoImage(Image.open("Background.jpg"))
 bgLabel = tk.Label(root, image=bgImage).pack()
-answerList = []
 
 # Student Login Frame
 studentLoginFrame = tk.LabelFrame(root, text="Student Login", bg="white", fg="#83aff7", height=600, width=500,
@@ -675,16 +680,20 @@ studentPasswordEntry = tk.Entry(studentLoginFrame, width=40, font=("Times New Ro
 studentPasswordEntry.place(x=170, y=160, anchor=tk.CENTER)
 studentShowPasswordButton = tk.Button(studentLoginFrame, text="Show Password", bg="white", fg="black", bd=0,
                                       font=("Times New Roman", 10), cursor="hand2", command=studentShowPasswordFunction)
+studentShowPasswordButton.bind("<Return>", studentShowPasswordFunction)
 studentShowPasswordButton.place(x=400, y=160, anchor=tk.CENTER)
 studentForgotPasswordButton = tk.Button(studentLoginFrame, text="Forgot Password?", bg="white", fg="#453c85", bd=0,
                                         font=("Times New Roman", 10), cursor="hand2",
                                         command=studentForgotPasswordFunction)
+studentForgotPasswordButton.bind("<Return>", studentForgotPasswordFunction)
 studentForgotPasswordButton.place(x=285, y=190, anchor=tk.CENTER)
 studentLoginButton = tk.Button(studentLoginFrame, text="Log In", bg="white", fg="#4b396e", font=("Times New Roman", 12),
                                cursor="hand2", bd=0, command=studentLoginFunction)
+studentLoginButton.bind("<Return>", studentLoginFunction)
 studentLoginButton.place(x=30, y=220, anchor=tk.CENTER)
 studentSignUpButton = tk.Button(studentLoginFrame, text="Don't have an account? Sign up", bg="white", fg="#4b396e",
                                 bd=0, cursor="hand2", font=("Times New Roman", 10), command=studentSignUpFunction)
+studentSignUpButton.bind("<Return>", studentSignUpFunction)
 studentSignUpButton.place(x=95, y=260, anchor=tk.CENTER)
 
 # Staff Login Frame
@@ -705,15 +714,19 @@ staffPasswordEntry = tk.Entry(staffLoginFrame, width=40, font=("Times New Roman"
 staffPasswordEntry.place(x=170, y=160, anchor=tk.CENTER)
 staffShowPasswordButton = tk.Button(staffLoginFrame, text="Show Password", bg="white", fg="black", bd=0,
                                     font=("Times New Roman", 10), cursor="hand2", command=staffShowPasswordFunction)
+staffShowPasswordButton.bind("<Return>", staffShowPasswordFunction)
 staffShowPasswordButton.place(x=400, y=160, anchor=tk.CENTER)
 staffForgotPasswordButton = tk.Button(staffLoginFrame, text="Forgot Password?", bg="white", fg="#453c85", bd=0,
                                       font=("Times New Roman", 10), cursor="hand2", command=staffForgotPasswordFunction)
+staffForgotPasswordButton.bind("<Return>", studentForgotPasswordFunction)
 staffForgotPasswordButton.place(x=285, y=190, anchor=tk.CENTER)
 staffLoginButton = tk.Button(staffLoginFrame, text="Log In", bg="white", fg="#4b396e", font=("Times New Roman", 12),
                              cursor="hand2", bd=0, command=staffLoginFunction)
+staffLoginButton.bind("<Return>", staffLoginFunction)
 staffLoginButton.place(x=30, y=220, anchor=tk.CENTER)
 staffSignUpButton = tk.Button(staffLoginFrame, text="Don't have an account? Sign up", bg="white", fg="#4b396e", bd=0,
                               cursor="hand2", font=("Times New Roman", 10), command=staffSignUpFunction)
+staffSignUpButton.bind("<Return>", staffSignUpFunction)
 staffSignUpButton.place(x=95, y=260, anchor=tk.CENTER)
 
 # Student Sign up Frame
@@ -764,9 +777,11 @@ reEntryPasswordEntry = tk.Entry(studentSignUpFrame, width=30, font=("Times New R
 reEntryPasswordEntry.place(x=290, y=400, anchor=tk.CENTER)
 signUpButton = tk.Button(studentSignUpFrame, text="Sign up", bg="white", fg="black", font=("Times New Roman", 12),
                          cursor="hand2", bd=0, command=StudentSignUpFunction)
+signUpButton.bind("<Return>", StudentSignUpFunction)
 signUpButton.place(x=240, y=440, anchor=tk.CENTER)
 signUpBackButton = tk.Button(studentSignUpFrame, text="Back", fg="black", bg="white", font=("Times New Roman", 12),
                              cursor="hand2", bd=0, command=studentSignUpBackFunction)
+signUpBackButton.bind("<Return>", studentSignUpBackFunction)
 signUpBackButton.place(x=240, y=480, anchor=tk.CENTER)
 
 # Staff Sign up Frame
@@ -822,9 +837,11 @@ staffSubjectEntry = tk.Entry(staffSignUpFrame, width=30, font=("Times New Roman"
 staffSubjectEntry.place(x=290, y=440, anchor=tk.CENTER)
 staffSignUpButton = tk.Button(staffSignUpFrame, text="Sign up", bg="white", fg="black", font=("Times New Roman", 12),
                               cursor="hand2", bd=0, command=StaffSignUpFunction)
+staffSignUpButton.bind("<Return>", StaffSignUpFunction)
 staffSignUpButton.place(x=240, y=480, anchor=tk.CENTER)
 staffSignUpBackButton = tk.Button(staffSignUpFrame, text="Back", fg="black", bg="white", font=("Times New Roman", 12),
                                   cursor="hand2", bd=0, command=staffSignUpBackFunction)
+staffSignUpBackButton.bind("<Return>", staffSignUpBackFunction)
 staffSignUpBackButton.place(x=240, y=520, anchor=tk.CENTER)
 
 # Student Forgot Password Frame
@@ -838,9 +855,11 @@ sFPSAnsEntry = tk.Entry(studentForgotPasswordFrame, width=30, font=("Times New R
 sFPSAnsEntry.place(x=240, y=120, anchor=tk.CENTER)
 sFPSubmitButton = tk.Button(studentForgotPasswordFrame, text="Submit", fg="black", bg="white", bd=0, cursor="hand2",
                             font=("Times New Roman", 12), command=studentForgotPasswordSubmitFunction)
+sFPSubmitButton.bind("<Return>", studentForgotPasswordSubmitFunction)
 sFPSubmitButton.place(x=240, y=160, anchor=tk.CENTER)
 sFPBackButton = tk.Button(studentForgotPasswordFrame, text="Back", bg="white", fg="black", font=("Times New Roman", 12),
                           bd=0, cursor="hand2", command=studentForgotPasswordBackFunction)
+sFPBackButton.bind("<Return>", studentForgotPasswordBackFunction)
 sFPBackButton.place(x=240, y=200, anchor=tk.CENTER)
 
 # Student Password Reset Frame
@@ -857,9 +876,11 @@ sPRPasswordEntry2 = tk.Entry(studentPasswordResetFrame, width=30, font=("Times N
 sPRPasswordEntry2.place(x=240, y=160, anchor=tk.CENTER)
 sPRConfirmButton = tk.Button(studentPasswordResetFrame, text="Confirm", bg="white", fg="black", bd=0, cursor="hand2",
                              font=("Times New Roman", 12), command=studentResetPasswordConfirmFunction)
+sPRConfirmButton.bind("<Return>", studentResetPasswordConfirmFunction)
 sPRConfirmButton.place(x=240, y=200, anchor=tk.CENTER)
 sPRBackButton = tk.Button(studentPasswordResetFrame, text="Back", bg="white", fg="black", bd=0, cursor="hand2",
                           font=("Times New Roman", 12), command=studentResetPasswordBackFunction)
+sPRBackButton.bind("<Return>", studentResetPasswordBackFunction)
 sPRBackButton.place(x=240, y=240, anchor=tk.CENTER)
 
 # Staff Forgot Password Frame
@@ -872,9 +893,11 @@ SFPSAnsEntry = tk.Entry(staffForgotPasswordFrame, width=30, font=("Times New Rom
 SFPSAnsEntry.place(x=240, y=120, anchor=tk.CENTER)
 SFPSubmitButton = tk.Button(staffForgotPasswordFrame, text="Submit", fg="black", bg="white", bd=0, cursor="hand2",
                             font=("Times New Roman", 12), command=staffForgotPasswordSubmitFunction)
+SFPSubmitButton.bind("<Return>", staffForgotPasswordSubmitFunction)
 SFPSubmitButton.place(x=240, y=160, anchor=tk.CENTER)
 SFPBackButton = tk.Button(staffForgotPasswordFrame, text="Back", bg="white", fg="black", font=("Times New Roman", 12),
                           bd=0, cursor="hand2", command=staffForgotPasswordBackFunction)
+SFPBackButton.bind("<Return>", staffForgotPasswordBackFunction)
 SFPBackButton.place(x=240, y=200, anchor=tk.CENTER)
 
 # Staff Password Reset Frame
@@ -891,9 +914,11 @@ SPRPasswordEntry2 = tk.Entry(staffPasswordResetFrame, width=30, font=("Times New
 SPRPasswordEntry2.place(x=240, y=160, anchor=tk.CENTER)
 SPRConfirmButton = tk.Button(staffPasswordResetFrame, text="Confirm", bg="white", fg="black", bd=0, cursor="hand2",
                              font=("Times New Roman", 12), command=staffResetPasswordConfirmFunction)
+SPRConfirmButton.bind("<Return>", staffResetPasswordConfirmFunction)
 SPRConfirmButton.place(x=240, y=200, anchor=tk.CENTER)
 SPRBackButton = tk.Button(staffPasswordResetFrame, text="Back", bg="white", fg="black", bd=0, cursor="hand2",
                           font=("Times New Roman", 12), command=staffResetPasswordBackFunction)
+SPRBackButton.bind("<Return>", staffResetPasswordBackFunction)
 SPRBackButton.place(x=240, y=240, anchor=tk.CENTER)
 
 # Staff Inside Login Frame
@@ -928,18 +953,25 @@ sILAnswerEntry = tk.Entry(staffInsideLoginFrame, width=30, bg="white", relief=tk
 sILAnswerEntry.place(x=300, y=320, anchor=tk.CENTER)
 sILAddButton = tk.Button(staffInsideLoginFrame, text="Add", bg="white", fg="green", bd=0, font=("Times New Roman", 12),
                          cursor="hand2", command=staffInsideLoginAddFunction)
+sILAddButton.bind("<Return>", staffInsideLoginAddFunction)
 sILAddButton.place(x=100, y=360, anchor=tk.CENTER)
 sILUpdateButton = tk.Button(staffInsideLoginFrame, text="Update", bg="white", fg="blue", bd=0,
                             font=("Times New Roman", 12), cursor="hand2", command=staffInsideLoginUpdateFunction)
+sILUpdateButton.bind("<Return>", staffInsideLoginUpdateFunction)
 sILUpdateButton.place(x=200, y=360, anchor=tk.CENTER)
 sILDeleteButton = tk.Button(staffInsideLoginFrame, text="Delete", bg="white", fg="red", bd=0,
                             font=("Times New Roman", 12), cursor="hand2", command=staffInsideLoginDeleteFunction)
+sILDeleteButton.bind("<Return>", staffInsideLoginDeleteFunction)
 sILDeleteButton.place(x=300, y=360, anchor=tk.CENTER)
 sILShowAllButton = tk.Button(staffInsideLoginFrame, text="Show All", bg="white", fg="Purple", bd=0,
                              font=("Times New Roman", 12), cursor="hand2", command=staffInsideLoginShowAllFunction)
+sILShowAllButton.bind("<Return>", staffInsideLoginShowAllFunction)
 sILShowAllButton.place(x=400, y=360, anchor=tk.CENTER)
+sILNoteLabel = tk.Label(staffInsideLoginFrame, text="", bg="white", fg="#f76565", font=("Times New Roman", 12), justify=tk.LEFT)
+sILNoteLabel.place(x=0, y=440)
 sILLogoutButton = tk.Button(staffInsideLoginFrame, text="Log out", bg="white", fg="black", bd=0,
                             font=("Times New Roman", 12), cursor="hand2", command=staffInsideLogoutFunction)
+sILLogoutButton.bind("<Return>", staffInsideLogoutFunction)
 sILLogoutButton.place(x=1150, y=5, anchor=tk.CENTER)
 
 # Student Inside Login Frame
@@ -956,11 +988,14 @@ studentILSubjectCombobox = ttk.Combobox(studentInsideLoginFrame, width=30, state
 studentILSubjectCombobox.place(x=150, y=70, anchor=tk.CENTER)
 studentILSubjectOkButton = tk.Button(studentInsideLoginFrame, text="Ok", bg="white", fg="black", bd=0, cursor="hand2",
                                      font=("Times New Roman", 12), command=studentInsideLoginOkFunction)
+studentILSubjectOkButton.bind("<Return>", studentInsideLoginOkFunction)
 studentILSubjectOkButton.place(x=320, y=70, anchor=tk.CENTER)
 studentILSubmitButton = tk.Button(studentInsideLoginFrame, text="Submit", bg="white", fg="black", bd=0, cursor="hand2",
                                   font=("Times New Roman", 12), command=studentInsideSubmitFunction)
+studentILSubmitButton.bind("<Return>", studentInsideSubmitFunction)
 studentILLogoutButton = tk.Button(studentInsideLoginFrame, text="Log out", bg="white", fg="black", bd=0,
                                   font=("Times New Roman", 12), cursor="hand2", command=studentInsideLogoutFunction)
+studentILLogoutButton.bind("<Return>", studentInsideLogoutFunction)
 studentILLogoutButton.place(x=1150, y=5, anchor=tk.CENTER)
 
 # Student Inside Login Question Frame
@@ -971,10 +1006,12 @@ studentILPresentQuestionLabel = tk.Label(studentInsideLoginQuestionFrame, text="
                                          font=("Times New Roman", 12))
 studentILNextButton = tk.Button(studentInsideLoginQuestionFrame, text="Next >>", bg="white", fg="black", bd=0,
                                 font=("Times New Roman", 12), cursor="hand2", command=studentInsideLoginNextFunction)
+studentILNextButton.bind("<Return>", studentInsideLoginNextFunction)
 studentILNextButton.place(x=633, y=445)
 studentILPreviousButton = tk.Button(studentInsideLoginQuestionFrame, text="<< Previous", bg="white", fg="black", bd=0,
                                     font=("Times New Roman", 12), cursor="hand2",
                                     command=studentInsideLoginPreviousFunction)
+studentILPreviousButton.bind("<Return>", studentInsideLoginPreviousFunction)
 studentILPreviousButton.place(x=0, y=445)
 variable = tk.StringVar(studentInsideLoginQuestionFrame, "0")
 studentILRadioButton1 = tk.Radiobutton(studentInsideLoginQuestionFrame, variable=variable, value=1, padx=0, pady=0,
@@ -991,5 +1028,10 @@ studentILRadioButton4 = tk.Radiobutton(studentInsideLoginQuestionFrame, variable
 studentILRadioButton4.place(x=0, y=360)
 studentILClearButton = tk.Button(studentInsideLoginQuestionFrame, text="Clear", bg="white", fg="black", bd=0,
                                  font=("Times New Roman", 12), cursor="hand2", command=studentInsideLoginClearFunction)
-studentILClearButton.place(x=560, y=445)
+studentILClearButton.bind("<Return>", studentInsideLoginClearFunction)
+studentILClearButton.place(x=460, y=445)
+studentILSaveButton = tk.Button(studentInsideLoginQuestionFrame, text="Save", bg="white", fg="black", bd=0,
+                                font=("Times New Roman", 12), cursor="hand2", command=studentInsideLoginSaveFunction)
+studentILSaveButton.bind("<Return>", studentInsideLoginSaveFunction)
+studentILSaveButton.place(x=560, y=445)
 root.mainloop()
