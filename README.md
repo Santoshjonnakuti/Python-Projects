@@ -81,3 +81,10 @@ Modules Used:
 1. tkinter
 2. sqlite3
 
+
+[13. Quiz App](QuizApp)\
+Modules Used:
+1. tkinter
+2. sqlite3
+3. PIL
+
