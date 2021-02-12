@@ -253,10 +253,24 @@ def studentInsideLoginOkFunction(event=None):
 
 
 def studentInsideSubmitFunction(event=None):
-    global answerList
+    global answerList, questionsList, name
     yesNo = messagebox.askyesno("Submit", "Do you want to submit\nOnce submitted answers cannot be changed...")
     if yesNo is True:
         print(answerList)
+        answers = [ans[6] for ans in questionsList]
+        print(answers)
+        score = 0
+        for x, y in zip(answerList[1:], answers):
+            if x == y:
+                score += 1
+            else:
+                continue
+        studentInsideLoginFrame.place_forget()
+        studentUsernameEntry.delete(0, tk.END)
+        studentPasswordEntry.delete(0, tk.END)
+        studentLoginFrame.place(x=400, y=400, anchor=tk.CENTER)
+        staffLoginFrame.place(x=1100, y=400, anchor=tk.CENTER)
+        messagebox.showinfo("Score!", "{}, your score is {}".format(StudentDataBase.getName(name), score))
     else:
         return
     return
