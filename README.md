@@ -1,5 +1,5 @@
 # Python-Projects
-Simple python projects for beginners..\
+Simple python projects...\
 [1. Tic Tac Toe](Tic_Tac_Toe)\
 Modules Used:
 1. random
